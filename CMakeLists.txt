@@ -10,10 +10,14 @@ include_directories(HTTP/inc)
 include_directories(base/inc)
 include_directories(mysql-connector/include)
 
+#include_directories(/usr/src/kernels/4.18.0-348.2.1.el8_5.x86_64/include)
+
+
 aux_source_directory(TCP/src DIR_SRCS)
 aux_source_directory(log/src DIR_SRCS)
 aux_source_directory(time/src DIR_SRCS)
 aux_source_directory(HTTP/src DIR_SRCS)
+aux_source_directory(base/src DIR_SRCS)
 aux_source_directory(base/src DIR_SRCS)
 
 

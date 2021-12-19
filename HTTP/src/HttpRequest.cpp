@@ -4,12 +4,13 @@
 
 #include "server.h"
 
+
 namespace Http
 {
 
     const char *RN = "\r\n";
 
-    bool HttpRequest::readMessage(TCPConnection* conn)
+    bool HttpRequest::readMessage(TCPConnectionPtr conn)
     {
         std::vector<char>buf; 
         conn->readBuf(buf);

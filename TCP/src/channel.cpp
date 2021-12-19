@@ -5,18 +5,11 @@
 
 #include <chrono>
 
+std::shared_ptr<acceptor> Channel::acceptor_(nullptr);
 
-
-thread_local std::shared_ptr<PoolProcess> Channel::poolPro_(nullptr);
-TCPServer* Channel::server_=nullptr;
-
-void Channel::setPoolPro(std::shared_ptr<PoolProcess> pro)
+void Channel::setAcceptor(std::shared_ptr<acceptor> acc)
 {
-    poolPro_ = pro;
-}
-void Channel::setServer(TCPServer* server)
-{
-    server_=server;
+    acceptor_ = acc;
 }
 
 void Channel::dealEvent(epoll_event &event)
@@ -25,36 +18,30 @@ void Channel::dealEvent(epoll_event &event)
 
     if (event.events & POLLOUT)
     {
-        LOG_INFO<<"re send begin..."<<log::end;
+        LOG_INFO << "re send begin..." << log::end;
 
-        auto flag=buf_->sendSendable(fd_);
+        auto flag = buf_->sendSendable(fd_);
 
-        if(flag) disableWrite();
+        if (flag)
+            disableWrite();
 
-         isDeal = true;
+        isDeal = true;
     }
 
     if (event.events & (POLLIN)) //这个不能放在第一个，如果放在第一个则可能在写操作执行之前关闭端口
     {
-        if (fd_==poolPro_->weakUpFd()) // weakup 情况
+        assert(buf_ != nullptr);
+
+        auto res = buf_->saveReadable(fd_);
+
+        if (res)
         {
-            poolPro_->receiveWeakup();
+            acceptor_->readableCallBack_(shared_from_this());
         }
         else
         {
-            assert(buf_!=nullptr);   
-            
-            auto res=buf_->saveReadable(fd_);
-
-            if(res)
-            {
-                server_->connReadable(this);
-            }
-            else
-            {
-                Channel::close();
-                //关闭channel
-            }
+            Channel::close();
+            //关闭channel
         }
         isDeal = true;
     }
@@ -75,9 +62,9 @@ void Channel::enableWrite()
     LOG_INFO << "channel: " << fd_ << "  enable write..." << log::end;
     assert(!(events_ & POLLOUT));
 
-    events_ |= POLLOUT;
+    events_|=POLLOUT;
 
-    poolPro_->changeEvent(events_, fd_);
+    acceptor_->enable_write(fd_);
 }
 
 void Channel::disableWrite()
@@ -85,22 +72,22 @@ void Channel::disableWrite()
     LOG_INFO << "channel: " << fd_ << "  disable write..." << log::end;
     assert(events_ & POLLOUT);
 
-    events_ &= 0b1111'1111'1011;
+    events_=3;
 
-    poolPro_->changeEvent(events_, fd_);
+    acceptor_->diseable_write(fd_);
 }
 
 void Channel::close()
 {
-    poolPro_->removeFd(fd_);
+    acceptor_->removeFd(fd_);
 }
 
-void  Channel::readBuf(std::vector<char>&vec)
+void Channel::readBuf(std::vector<char> &vec)
 {
     buf_->readReadbale(vec);
 }
 
-void Channel::send(std::string &message)   //
+void Channel::send(std::string &message) //
 {
     buf_->sendMessage(std::move(message));
 

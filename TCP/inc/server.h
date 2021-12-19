@@ -18,7 +18,6 @@
 class  Channel;
 class TCPAddr;
 
-using TCPConnectionPtr=TCPConnection*;
 
 class TCPServer
 {
@@ -26,8 +25,10 @@ public:
     using TcpAddrPtr        = std::shared_ptr<TCPAddr>;
     using ChannelPtr  = std::shared_ptr<Channel>;
     using BufferPtr         = std::shared_ptr<Buffer>;
-    using NewconnFunction   = std::function<void(TCPConnection*)>;
-    using ReadableFunction  = std::function<void(TCPConnection*)>;
+
+
+    using NewconnFunction   = std::function<void(TCPConnectionPtr)>;
+    using ReadableFunction  = std::function<void(TCPConnectionPtr)>;
 
     static std::shared_ptr<TCPServer> init(TcpAddrPtr listenAddr, int num);
 
@@ -48,9 +49,9 @@ public:
 
 private:
    
-    void connNew(Channel*);
+    void connNew(std::shared_ptr<Channel>);
 
-    void connReadable(Channel*);
+    void connReadable(std::shared_ptr<Channel>);
 
     // void removeConnection(std::string index);
 
@@ -59,7 +60,7 @@ private:
 private:
     std::shared_ptr<ThreadPool> pool_;      //线程池
 
-    std::unique_ptr<acceptor> connRecv_;    //io副用
+    std::shared_ptr<acceptor> connRecv_;    //io副用
 
     TcpAddrPtr listenAddr_;                 //监听的地址
 

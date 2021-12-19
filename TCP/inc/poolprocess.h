@@ -11,58 +11,17 @@
 #include <mutex>
 
 #include <assert.h>
-#include <sys/epoll.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include "logger.h"
+#include "task.h"
+#include "safe_queue.h"
 
-class TCPServer;
-class Channel;
-
-#define NEW_PLAYER 1
-
-class  FdPack  //为了防止管道粘包，封包和拆宝类
-{
-    FdPack(int fd=-1)
-    {
-        buf_[0]=88480;
-        buf_[1]=fd;
-        buf_[2]=44840;
-    }
-
-    void sendFd()
-    {
-        if(buf_[1]!=-1)
-        {
-            auto n = ::write(weakUpFd_, &buf_, size_);
-            assert(n == size_);
-        }
-    }
-
-    int getFd()
-    {
-        int temp[size_]={0};
-
-        auto n = ::read(weakUpFd_, &temp, size_);
-        assert(n == size_);
-
-    }
-
-    static void setWeakUpFd(int fd){weakUpFd_=fd;}
-
-private:
-    static int  weakUpFd_;
-    static const int size_=3;
-
-    int buf_[size_];
-};
 
 
 class PoolProcess: public std::enable_shared_from_this<PoolProcess>
 {
 public:
 
-    using MapType=std::map<int,std::shared_ptr<Channel>>;
+    // using MapType=std::map<int,std::shared_ptr<Channel>>;
 
 
     PoolProcess();
@@ -71,42 +30,18 @@ public:
 
     void operator()();
 
-    void pushConnect(const int fd)
+    void pushConnect(Task& task)
     {
-        LOG_INFO<< "PoolProcess::pushConnect" << fd << "   epollfd:" << epollFd_ << log::end;
-        weakup(fd);
+        LOG_INFO << "push task" << log::end;
+        que_.push(std::move(task));
     }
 
-    void changeEvent(int event,int fd);
-
-     int weakUpFd()const {return pipe_[0];}
-
-    friend Channel;
 
 private:
-    void distribute();
+    void workLoop();
 
-    void removeFd(int fd);
- 
-    void weakup(int);
+    SafeQueue<Task>que_;
 
-    void receiveWeakup();
-
-    void insertToEpoll(const std::shared_ptr< Channel>& Channel);
-
-    int epollFd_;
-
-    int pipe_[2];
-
-    std::shared_ptr<Channel> weakupChannel_;
-
-    MapType channelMap_;
-
-    static const int evenListMax_ = 16;
-    
-    epoll_event events_[evenListMax_];
-
-    const int timeout_;
 };
 
 

@@ -2,6 +2,9 @@
 #include "logger.h"
 #include "assert.h"
 #include "channel.h"
+
+#include "task.h"
+
 typename std::shared_ptr<TCPServer> TCPServer::entity_ = nullptr;
 
 std::shared_ptr<TCPServer> TCPServer::init(TcpAddrPtr listenAddr, int num) //创建服务器对象实例
@@ -17,46 +20,48 @@ std::shared_ptr<TCPServer> TCPServer::init(TcpAddrPtr listenAddr, int num) //创
 TCPServer::TCPServer(TcpAddrPtr listenAddr, int threadNum)
     : listenAddr_(listenAddr), threadNum_(threadNum)
 {
-    connRecv_ = std::make_unique<EpollConnect>(*listenAddr,
-                                               [this](int fd)
-                                               { pool_->pushConnect(fd); }); //这地方以后要用工厂模式                                       
+            
 }
 
 void TCPServer::beginServer()
 {
     LOG_DEBUG << "Server begin......." << log::end;
 
-    Channel::setServer(this);
-
     pool_ = ThreadPool::init(threadNum_);
 
     pool_->begin();
+
+    connRecv_ = std::make_shared<EpollConnect>(*listenAddr_,
+                                               std::bind(&TCPServer::connNew,this,std::placeholders::_1),
+                                               std::bind(&TCPServer::connReadable,this,std::placeholders::_1)); //这地方以后要用工厂模式                               
 
     connRecv_->begin();
 }
 
 // 处理新连接,
-void TCPServer::connNew(Channel *channel)
+void TCPServer::connNew(std::shared_ptr<Channel>channel)
 {
     LOG_INFO << "TCPServer::newConnection： " << channel->fd() << "   " << log::end;
 
-    TCPConnection connection(channel);
-
     if (connectCallBack_)
-        connectCallBack_(&connection);
+    {
+        Task task(connectCallBack_,std::move(channel));
+        pool_->pushConnect(task);
+    }
 }
 
-void TCPServer::connReadable(Channel *channel)
+void TCPServer::connReadable(std::shared_ptr<Channel>channel)
 {
     LOG_INFO << "connection can be read!" << log::end;
 
-    TCPConnection connection(channel);
-
     if (readableCallBack_)
-        readableCallBack_(&connection);
+    {
+        Task task(readableCallBack_,std::move(channel));
+        pool_->pushConnect(task);
+    }
 }
 
-// void TCPServer::removeConnection(std::string index)
+// void TCPServer::remove+Connection(std::string index)
 // {
 // LOG_DEBUG<<"TCP Server remove connection..."<<log::end;
 

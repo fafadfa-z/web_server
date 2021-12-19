@@ -7,6 +7,9 @@
 #include <memory>
 
 class TCPConnection;
+
+using TCPConnectionPtr=std::shared_ptr<TCPConnection>;
+
 namespace Http
 {
     extern const char *RN;
@@ -35,7 +38,7 @@ namespace Http
         {
         }
 
-        bool readMessage(TCPConnection*);
+        bool readMessage(TCPConnectionPtr);
 
         void display();
 

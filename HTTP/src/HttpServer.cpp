@@ -10,10 +10,12 @@
 
 class TCPConnection;
 
+
+
 namespace Http
 {
     const std::string HttpServer::sourcePath_=
-    "/home/fafadfa/project/myProject/sever/great-try/HtmlFiles";
+    "/home/fafadfa/project/webserver/web_server/HtmlFiles";
 
     HttpServer *HttpServer::entity = nullptr;
 
@@ -70,8 +72,8 @@ namespace Http
         tcpServer_ = TCPServer::init(address, 1);
 
         tcpServer_->setReadableCallBack(std::bind(&HttpServer::dealMessage,*this,std::placeholders::_1));
-        tcpServer_->setConnectCallBack([this](TCPConnectionPtr conn) -> void
-                                        {dealConnection(conn);});
+        // tcpServer_->setConnectCallBack([this](TCPConnectionPtr conn) -> void
+        //                                 {dealConnection(conn);});
         
         HttpDeal::setResource(&WebResources_);
     }
@@ -81,7 +83,7 @@ namespace Http
         tcpServer_->beginServer();
     }
 
-    void HttpServer::dealMessage( TCPConnection *conn)
+    void HttpServer::dealMessage( TCPConnectionPtr conn)
     {
         LOG_HTTP<<"Begin dealMessage..."<<log::end;
         //send_to_baidu(buf,conn->fd());
@@ -104,7 +106,7 @@ namespace Http
         }
     }
 
-    void HttpServer::connectClose(TCPConnection* conn)
+    void HttpServer::connectClose(TCPConnectionPtr conn)
     {
 
         LOG_HTTP << "HttpServer::connectClose" << log::end;
@@ -114,7 +116,7 @@ namespace Http
         //conn->close();
     }
 
-    void HttpServer::dealConnection(TCPConnection* conn)
+    void HttpServer::dealConnection(TCPConnectionPtr conn)
     {
         connCount++;
     }

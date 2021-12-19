@@ -15,7 +15,7 @@ class TCPConnection
 {
 public:
  
-    TCPConnection(Channel*);
+    TCPConnection(std::shared_ptr<Channel>);
     ~TCPConnection();
 
     auto readBuf(std::vector<char>&vec)
@@ -38,7 +38,10 @@ public:
     auto fd()const {return channel_->fd();}
 
 private:
-    Channel* channel_;
+   std::shared_ptr<Channel> channel_;
 };
+
+using TCPConnectionPtr=std::shared_ptr<TCPConnection>;
+
 
 #endif

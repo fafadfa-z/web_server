@@ -2,6 +2,8 @@
 #include "logger.h"
 #include "assert.h"
 
+#include "task.h"
+
 std::shared_ptr<ThreadPool> ThreadPool::entity_=nullptr;
 
 std::shared_ptr<ThreadPool> ThreadPool::init(int threadNum)
@@ -30,11 +32,11 @@ void ThreadPool::begin()
     }
 }
 
-void ThreadPool::pushConnect(const int fd)
+void ThreadPool::pushConnect(Task& task)
 {
     if(current_==threadNum_) current_=0; 
 
-    (poolProcesses_[current_])->pushConnect(fd);
+    (poolProcesses_[current_])->pushConnect(task);
     
     current_++;
 }

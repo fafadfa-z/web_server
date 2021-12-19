@@ -16,25 +16,41 @@
 class EpollConnect:public acceptor
 {
 public:
-    EpollConnect(TCPAddr addr,std::function<void(int)>submitFun)
-        :acceptor(addr,submitFun)
+    EpollConnect(TCPAddr addr,TaskFun newConn,TaskFun readable)
+        :acceptor(addr,newConn,readable)
     {
     }
     ~EpollConnect();
-  
+
+public:
+
+
+    void enable_write(int) override;  //开始写入
+
+    void diseable_write(int)override; // 结束写入
+
+    void removeFd(int)override; // 结束写入
+
+
 private:
-    void setSendBufSize(int fd, size_t size = 5120)
-    {
-        ::setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
-    }
 
     bool acceptInit() override;
 
     void acceptLoop() override;
 
-    void addfd(int fd, unsigned short event); //向epoll 中添加文件描述符
+private:    
+    
+    void acceptNewConn();
 
-private:
+
+    void addfd(int fd, unsigned short event); //向epoll 中添加文件描述符
+    
+    void setSendBufSize(int fd, size_t size = 5120)
+    {
+        ::setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
+    }
+
+  
 
     int epollFd_; //epoll 复用
 
@@ -44,7 +60,7 @@ private:
 
     epoll_event events_[evenListMax_];
 
-    int nums;
+
 };
 
 #endif

@@ -13,7 +13,7 @@
 
 #include "timePoint.h"
 
-class PoolProcess;
+class acceptor;
 class TCPServer;
 class Buffer;
 
@@ -29,6 +29,8 @@ public:
         timeCost_("channel: ")
     {
     }
+    Channel(const Channel& )=delete;
+    Channel& operator=(const Channel& )=delete;
 
     ~Channel();
 
@@ -42,8 +44,8 @@ public:
 
     void enableWrite();
 
-    static void setPoolPro(std::shared_ptr<PoolProcess>pro);
-    static void setServer(TCPServer*  server);
+    static void setAcceptor(std::shared_ptr<acceptor>pro);
+    //static void setServer(TCPServer*  server);
 
     int fd()const {return fd_;}
 
@@ -56,16 +58,15 @@ private:
     int fd_;
     int events_;
 
+
     Time::TimeRecord timeCost_;// 记录占用时间
 
     std::shared_ptr<Buffer>buf_;
 
-
-
 private:
 
-    static thread_local std::shared_ptr<PoolProcess> poolPro_;
-    static TCPServer* server_;
+    static  std::shared_ptr<acceptor> acceptor_;
+    //static TCPServer* server_;
 };
 
 

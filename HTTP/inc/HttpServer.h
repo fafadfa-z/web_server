@@ -8,6 +8,8 @@ class TCPConnection;
 class TCPServer;
 class WebResources;
 
+
+using TCPConnectionPtr=std::shared_ptr<TCPConnection>;
 namespace Http
 {
     class HttpServer
@@ -23,10 +25,10 @@ namespace Http
     private:
         HttpServer();
 
-        void dealMessage(TCPConnection* conn);
-        void dealConnection(TCPConnection* conn);
+        void dealMessage(TCPConnectionPtr conn);
+        void dealConnection(TCPConnectionPtr conn);
         char *findRequest(char *start, char *end);
-        void connectClose(TCPConnection* conn);
+        void connectClose(TCPConnectionPtr conn);
 
         long connCount;  // 记录当前的连接数
  
