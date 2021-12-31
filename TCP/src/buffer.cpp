@@ -3,14 +3,28 @@
 #include "logger.h"
 #include <errno.h>
 
+#include "buff_pool.h"
+
+thread_local std::shared_ptr<BufferPool> Buffer::pool_ = nullptr;
+
 Buffer::Buffer()
-    : readBuf_(initSize_), sendBuf_(initSize_), readIndex_(0), sendIndex1_(0), sendIndex2_(0)
+    : readIndex1_(0), readIndex2_(0), sendIndex1_(0), sendIndex2_(0)
 {
+    assert(pool_ != nullptr);
+
+    ReadBufSize_ = pool_->getBuf(readBuf_, initSize_);
+    SendBufSize_ = pool_->getBuf(sendBuf_, initSize_);
+
+    assert(readBuf_ != nullptr);
+    assert(sendBuf_ != nullptr);
 }
 
 Buffer::~Buffer()
 {
-    LOG_INFO << "buffer 析构"<<log::end;
+    pool_->freeBuf(readBuf_, ReadBufSize_);
+    pool_->freeBuf(sendBuf_, SendBufSize_);
+
+    LOG_INFO << "buffer 析构" << log::end;
 }
 
 bool Buffer::saveReadable(int fd)
@@ -24,27 +38,47 @@ bool Buffer::saveReadable(int fd)
     if (n <= 0)
         return false;
 
-    if (readIndex_)
-        LOG_DEBUG << "writeIndex_: " << readIndex_ << log::end;
+    if (readIndex1_)
+        LOG_DEBUG << "writeIndex1_: " << readIndex1_ << log::end;
 
-    if (readIndex_ + n > readBuf_.size())
+    if (readIndex2_ + n > ReadBufSize_)
     {
-        LOG_DEBUG << "read Buf need resize..." << log::end;
-        readBuf_.resize(readIndex_ + n);
+
+        int resize = readIndex2_ - readIndex1_ + 1 + n;
+        LOG_DEBUG << "read Buf need resize: " << resize << log::end;
+
+        // readIndex_=pool_->changeBuf(readBuf_,readIndex_,readIndex_+n); //����buffer
+        char *temp;
+        int preSize=ReadBufSize_;
+
+        ReadBufSize_ = pool_->getBuf(temp, resize);
+
+        assert(temp != nullptr);
+
+        assert(readIndex2_-readIndex1_<=ReadBufSize_);
+
+        std::copy(readBuf_ + readIndex1_, readBuf_ + readIndex2_,temp);
+
+        pool_->freeBuf(readBuf_,preSize);
+
+        readIndex2_-=readIndex1_;
+        readIndex1_=0;
+
+        readBuf_=temp;
     }
 
-    std::move(buf, buf + n, readBuf_.begin() + readIndex_);
+    std::copy(buf, buf + n, readBuf_ + readIndex2_);
 
-    readIndex_ += n;
+    readIndex2_ += n;
 
     return true;
 }
 
 void Buffer::readReadbale(std::vector<char> &vec)
 {
-    vec.assign(readBuf_.begin(),readBuf_.begin()+readIndex_);
+    // vec.assign(readBuf_,readBuf_+readIndex_);
 
-    readIndex_ = 0;
+    // readIndex_ = 0;
 }
 
 bool Buffer::sendSendable(int fd)
@@ -53,9 +87,7 @@ bool Buffer::sendSendable(int fd)
 
     int size = sendIndex2_ - sendIndex1_;
 
-    auto n = ::send(fd, &*sendBuf_.begin() + sendIndex1_, size, 0);
-
-    LOG_INFO <<"fafadfa"<<std::string(sendBuf_.begin(),sendBuf_.end()) << log::end;
+    auto n = ::send(fd, sendBuf_ + sendIndex1_, size, 0);
 
     if (n == size)
     {
@@ -67,7 +99,7 @@ bool Buffer::sendSendable(int fd)
     }
     else
     {
-        LOG_DEBUG << "Buffer：需要二次发送" << log::end;
+        LOG_DEBUG << "Buffer：需要二次发�??" << log::end;
         sendIndex1_ += n;
         return false;
     }
@@ -75,30 +107,34 @@ bool Buffer::sendSendable(int fd)
 
 void Buffer::sendMessage(std::string &&mes) //缓存等待发送的数据
 {
-    int size = mes.size();
-    if (sendIndex2_ + size > sendBuf_.size())
+    int n = mes.size();
+    if (sendIndex2_ + n > SendBufSize_)
     {
-        LOG_DEBUG<<"Buffer 扩容.. size= "<<size<<" buf size: "<<sendBuf_.size()<<log::end;
+        int resize = sendIndex2_ - sendIndex1_ + 1 + n;
 
-        std::vector<char> temp(sendIndex2_ + size); //先分配内存，手动扩容
+        LOG_DEBUG << "send Buf need resize: " << resize << log::end;
 
-        if (sendIndex1_ != 0)
-            std::move(sendBuf_.begin() + sendIndex1_,
-                      sendBuf_.begin() + sendIndex2_,
-                      temp.begin());
+        char *temp;
+        int preSize=SendBufSize_;
 
-        std::move(mes.begin(), mes.end(), temp.begin() + sendIndex2_ - sendIndex1_);
+        SendBufSize_ = pool_->getBuf(temp, resize);
 
-        std::swap(temp, sendBuf_);
+        assert(temp != nullptr);
 
-        sendIndex1_ = 0;
-        sendIndex2_ = sendIndex2_ - sendIndex1_ + size;
+        assert(sendIndex2_-sendIndex1_<=SendBufSize_);
 
-        temp.clear();
+        std::copy(sendBuf_ + sendIndex1_, sendBuf_ + sendIndex2_,temp);
+
+        pool_->freeBuf(readBuf_,preSize);
+
+        sendIndex2_-=sendIndex1_;
+        sendIndex1_=0;
+
+        sendBuf_=temp;
     }
     else
     {
-        std::move(mes.begin(), mes.end(), sendBuf_.begin() + sendIndex2_);
-        sendIndex2_ += size;
+        std::copy(mes.begin(), mes.end(), sendBuf_ + sendIndex2_);
+        sendIndex2_ += n;
     }
 }

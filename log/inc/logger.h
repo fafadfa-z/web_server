@@ -54,7 +54,7 @@ const bool enableDebug = 1;
 
 const bool enableHttpDebug = 1;
 
-const log::LogLevel logLevel = log::LogLevel::INFO_;
+const log::LogLevel logLevel = log::LogLevel::DEBUG_;
 
 #define LOG_INFO                        \
   if (logLevel <= log::LogLevel::INFO_) \

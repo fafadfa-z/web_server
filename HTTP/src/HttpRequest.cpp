@@ -4,32 +4,114 @@
 
 #include "server.h"
 
-
 namespace Http
 {
 
-    const char *RN = "\r\n";
+    const char *RN = "\r\n\r\n";
 
-    bool HttpRequest::readMessage(TCPConnectionPtr conn)
+    auto HttpRequest::readMessage(TCPConnection *conn)
     {
-        std::vector<char>buf; 
-        conn->readBuf(buf);
+        LOG_HTTP << "read http message begin.." << log::end;
 
-        LOG_HTTP<<"read http message begin.."<<log::end;
+        auto [left, right] = conn->buffer();
 
-        auto index = std::search(buf.begin(), buf.end(), RN, RN + 2); //寻找 \r\n
+        int size = 0;
 
-        if (index == buf.end())
-            return false;
+        char* temp;
 
-        if (getRequest(&buf[0], &*index)) //处理请求行
+        int currentSize; //当前传过来的数据数量
+
+        int needSize; //当前还需要的数据量
+
+        std::map<std::string, std::string>::iterator iter;
+
+        switch (state_)
         {
-            getHeader(&*(index + 2), &*buf.end()); // 处理首部行
-            LOG_HTTP<<"read http message finish!"<<log::end;
-        }
-        else return false;
+        case empty_:
+            left = findMessageHead(conn);
 
-        return true;
+            //如果没有找到Http请求行
+            if (left == nullptr)
+                return std::pair(badMes, right);
+
+        case needHead_:
+            temp = std::search(left, right, RN, RN + 4);
+
+            //如果请求行太长了，，，，
+            if (std::distance(left, temp) > maxRequestSize)
+                return std::pair(badMes, right);
+
+            state_ = needHead_;
+
+            //如果没有\r\n\r\n 则说明没发完
+            if (temp == right)
+                return std::pair(MoreMes, left);
+
+            left = getHeader(left, temp);
+
+            state_ = needEntity_;
+
+        case needEntity_:
+
+            //后面没有数据了
+            if (iter = headerMap_.find(std::string("Content-Length")); iter == headerMap_.end())
+            {
+                LOG_HTTP << "read message without entity" << log::end;
+                return std::pair(CanDeal, left);
+            }
+            else
+                size =::atoi(iter->second.c_str());
+
+            currentSize = right - left; //当前传过来的数据数量
+
+            needSize = size - entity_.size(); //当前还需要的数据量
+
+            assert(currentSize >= 0);
+            assert(needSize >= 0);
+
+            if (needSize < currentSize) //发送来的数据包大于需要的数据包
+            {
+                entity_.append(left, left + needSize);
+
+                state_ = finish_;
+
+                return std::pair(CanDeal, left + needSize);
+            }
+            else
+            {
+                entity_.append(left, left + currentSize);
+                return std::pair(MoreMes, right);
+            }
+        case finish_:
+
+        default: ;
+
+        }
+        return std::pair(badMes, right);
+    }
+
+    char *HttpRequest::findMessageHead(TCPConnection *conn)
+    {
+        auto [left, right] = conn->buffer();
+
+        auto index = left;
+
+        while (left <= right - 2)
+        {
+            index = std::search(left, right, RN, RN + 2); //寻找 \r\n
+
+            if (index == right)
+                return nullptr; //没有\r\n 说明是垃圾
+
+            auto ret = getRequest(left, index); //处理请求
+
+            left = index + 2;
+
+            if (ret)
+                return left; //如果找到了消息头，则直接返回
+        }
+
+        return nullptr;
     }
 
     bool HttpRequest::getRequest(char *start, char *end)
@@ -46,22 +128,17 @@ namespace Http
 
             if (iter != end)
             {
-                query_ += std::string(index, iter);
+                query_.append(index, iter);
             }
-
             if (setHttpVersion(++iter, end))
             {
                 return true;
             }
         }
-        else
-        {
-            return false;
-        }
         return false;
     }
 
-    void HttpRequest::getHeader(char *start, char *end)
+    char *HttpRequest::getHeader(char *start, char *end) //检索首部字段。
     {
         LOG_HTTP << "get header begin...." << log::end;
 
@@ -76,8 +153,9 @@ namespace Http
             if (iter != indexEnd)
                 headerMap_[std::string(indexStart, iter)] = std::string(iter + 2, indexEnd);
 
-            indexStart = indexEnd + 2; //这里在最后一次指针溢出了，但是并没有被使用，所以没有问题
+            indexStart = indexEnd + 2;
         }
+        return end + 4;
     }
 
     bool HttpRequest::setHttpVersion(char *start, char *end)
@@ -104,29 +182,14 @@ namespace Http
     {
         std::string message(start, end);
 
-        if (message == "GET")
+        if (message.find("GET") != -1)
         {
             request_ = Get;
             return true;
         }
-        if (message == "POST")
+        if (message.find("POST") != -1)
         {
-            request_ = Post;
-            return true;
-        }
-        if (message == "HEAD")
-        {
-            request_ = Head;
-            return true;
-        }
-        if (message == "KPUT")
-        {
-            request_ = Put;
-            return true;
-        }
-        if (message == "kDelete")
-        {
-            request_ = Delete;
+            request_ = Get;
             return true;
         }
         return false;
@@ -142,12 +205,6 @@ namespace Http
             return "Get";
         case Post:
             return "Post";
-        case Head:
-            return "Head";
-        case Put:
-            return "Put";
-        case Delete:
-            return "Delete";
         };
         return "";
     }

@@ -3,9 +3,11 @@
 #include "channel.h"
 #include "logger.h"
 
-TCPConnection::TCPConnection(std::shared_ptr<Channel> channel)
-    :channel_(channel)
+TCPConnection::TCPConnection(Channel* channel)
+    :channel_(channel),buffer_(channel_->buf())
 {
+
+
 }
 
 

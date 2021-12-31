@@ -8,19 +8,15 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "channel.h"
-
-acceptor::acceptor(TCPAddr addr,TaskFun newConn,TaskFun readable)
-    :addr_(addr),newConnCallBack_(newConn),readableCallBack_(readable),nums_(0)
-{   
+acceptor::acceptor(TCPAddr addr,std::function<void(int)>submit)
+    :addr_(addr),submitCallBack_(submit)
+{
 
 }
 
 bool acceptor::begin(int fd)
 {
     listenFd_=fd;
-
-    Channel::setAcceptor(shared_from_this());
 
     auto ret=acceptInit();
 

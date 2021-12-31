@@ -10,14 +10,10 @@ include_directories(HTTP/inc)
 include_directories(base/inc)
 include_directories(mysql-connector/include)
 
-#include_directories(/usr/src/kernels/4.18.0-348.2.1.el8_5.x86_64/include)
-
-
 aux_source_directory(TCP/src DIR_SRCS)
 aux_source_directory(log/src DIR_SRCS)
 aux_source_directory(time/src DIR_SRCS)
 aux_source_directory(HTTP/src DIR_SRCS)
-aux_source_directory(base/src DIR_SRCS)
 aux_source_directory(base/src DIR_SRCS)
 
 
@@ -30,7 +26,7 @@ aux_source_directory(./ DIR_SRCS)
 set(TEST_MATH ${DIR_SRCS})   #这句话要是不加，则不会生成src下的目录
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g  -ldl -DDEBUG")   #对应g++的输入参数
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g  -ldl -DDEBUG")   #对应g++的输入参数
 
 add_executable(out.exe ${TEST_MATH})
 

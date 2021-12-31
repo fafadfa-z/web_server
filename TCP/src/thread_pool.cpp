@@ -1,8 +1,9 @@
 #include "thread_pool.h"
 #include "logger.h"
 #include "assert.h"
+#include "buffer.h"
 
-#include "task.h"
+
 
 std::shared_ptr<ThreadPool> ThreadPool::entity_=nullptr;
 
@@ -18,10 +19,10 @@ std::shared_ptr<ThreadPool> ThreadPool::init(int threadNum)
 
 void ThreadPool::begin()
 {
-
     LOG_DEBUG<<"Thread pool begin!  threadNum:"<<threadNum_<<log::end;
-    
 
+    std::vector<std::thread::id>idVec;
+ 
     for(int i=0;i<threadNum_;i++)
     {
         poolProcesses_.push_back(std::make_shared<PoolProcess>());
@@ -29,14 +30,17 @@ void ThreadPool::begin()
         threadList.push_back(std::thread([this,i]{(poolProcesses_[i])->operator()();}));
 
         threadList[i].detach();
+
+        idVec.push_back(threadList[i].get_id());
     }
+
 }
 
-void ThreadPool::pushConnect(Task& task)
+void ThreadPool::pushConnect(const int fd)
 {
     if(current_==threadNum_) current_=0; 
 
-    (poolProcesses_[current_])->pushConnect(task);
+    (poolProcesses_[current_])->pushConnect(fd);
     
     current_++;
 }

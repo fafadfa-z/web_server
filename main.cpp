@@ -2,18 +2,15 @@
 
 #include <string>
 #include <unistd.h>
+#include <vector>
 
 #include "server.h"
-#include "timePoint.h"
-
 #include "logger.h"
-
 #include "HttpServer.h"
 
-#include "htmlFile.h"
-
-#include "mysql.h"
-
+#include "buffer.h"
+#include "buff_pool.h"
+#include "LocalMessage.h"
 
 using std::string;
 
@@ -30,18 +27,10 @@ int main()
 
     httpSever->beginServer();
 
-
-
-
-
-
     while(1)
     {   
         sleep(10);
     }
     
-
-
-
     return 0;
 }

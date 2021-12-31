@@ -17,22 +17,18 @@ inline int getTid()
     return thread_tid;
 }
 
-
 class LocalMassage
 {
 public:
     static LocalMassage* init(const std::string& );
 
-    ~LocalMassage();
-    
+    ~LocalMassage();   
 
 private:
     LocalMassage(const std::string&);
 
     static LocalMassage* entity_;  //单例实体
 };
-
-
 
 
 

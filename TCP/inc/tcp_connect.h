@@ -7,41 +7,42 @@
 #include "buffer.h"
 #include "channel.h"
 
-
-
-
-// åªæ˜¯å¯¹å¤–æä¾›çš„æ¥å£
 class TCPConnection
 {
 public:
  
-    TCPConnection(std::shared_ptr<Channel>);
+    TCPConnection(Channel*);
     ~TCPConnection();
 
-    auto readBuf(std::vector<char>&vec)
+    auto readBuf(std::vector<char>&vec,size_t size)
     {
-          return channel_->readBuf(vec);
+        return channel_->readBuf(vec);
     }
 
-    void send(std::string& message)
-    {
-        channel_->send(message);
-    }
+    void send(std::string& message) {channel_->send(message);}
+
+    auto buffer()const 
+    { 
+        char* const index1=buffer_->readBuf_+buffer_->readIndex1_;
+        char* const index2=buffer_->readBuf_+buffer_->readIndex2_;
+
+        return std::pair(index1,index2);
+    };
 
     void send(const char* message)
     {
-        std::string temp(message);
-        
-        send(temp);
+            std::string temp(message);
+            
+            send(temp);
     }
-    
+
+    void clearBuf() {buffer_->clearRead();} //ÉáÆúËùÓĞÊı¾İ
+     
     auto fd()const {return channel_->fd();}
 
 private:
-   std::shared_ptr<Channel> channel_;
+    Channel* channel_;
+    Buffer*  buffer_;
 };
-
-using TCPConnectionPtr=std::shared_ptr<TCPConnection>;
-
 
 #endif

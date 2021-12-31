@@ -10,8 +10,6 @@
 
 class TCPConnection;
 
-
-
 namespace Http
 {
     const std::string HttpServer::sourcePath_=
@@ -72,8 +70,8 @@ namespace Http
         tcpServer_ = TCPServer::init(address, 1);
 
         tcpServer_->setReadableCallBack(std::bind(&HttpServer::dealMessage,*this,std::placeholders::_1));
-        // tcpServer_->setConnectCallBack([this](TCPConnectionPtr conn) -> void
-        //                                 {dealConnection(conn);});
+        tcpServer_->setConnectCallBack([this](TCPConnectionPtr conn) -> void
+                                        {dealConnection(conn);});
         
         HttpDeal::setResource(&WebResources_);
     }
@@ -83,30 +81,30 @@ namespace Http
         tcpServer_->beginServer();
     }
 
-    void HttpServer::dealMessage( TCPConnectionPtr conn)
+    void HttpServer::dealMessage( TCPConnection *conn)
     {
         LOG_HTTP<<"Begin dealMessage..."<<log::end;
         //send_to_baidu(buf,conn->fd());
 
         HttpRequest quest;
 
-        auto flag = quest.readMessage(conn);
+        //auto flag = quest.readMessage(conn);
 
-        if (flag == false)
-            connectClose(conn);
-        else
-        {
-           LOG_HTTP<<"Begin deal request..."<<log::end;
+        // if (flag == false)
+        //     connectClose(conn);
+        // else
+        // {
+        //    LOG_HTTP<<"Begin deal request..."<<log::end;
 
-           HttpDeal deal(quest,*conn);
+        //    HttpDeal deal(quest,*conn);
 
-           deal.dealQuest();
+        //    deal.dealQuest();
            
-           LOG_HTTP<<"deal http ok!"<<log::end;
-        }
+        //    LOG_HTTP<<"deal http ok!"<<log::end;
+        // }
     }
 
-    void HttpServer::connectClose(TCPConnectionPtr conn)
+    void HttpServer::connectClose(TCPConnection* conn)
     {
 
         LOG_HTTP << "HttpServer::connectClose" << log::end;
@@ -116,7 +114,7 @@ namespace Http
         //conn->close();
     }
 
-    void HttpServer::dealConnection(TCPConnectionPtr conn)
+    void HttpServer::dealConnection(TCPConnection* conn)
     {
         connCount++;
     }

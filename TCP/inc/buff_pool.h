@@ -4,29 +4,36 @@
 
 #include<memory>
 #include<vector>
-#include<thread>
-#include<list>
-
+#include <stdlib.h>
+#include <assert.h>
+#include <stack>
 
 class BufferPool;
 
 using BuffPoolPtr=std::shared_ptr<BufferPool>;
 
 
-struct ThreadBufMes //储存单线程当前线程池的大小。
+struct ThreadBufMes //储存单线程当前内存池的大小�?
 {
-    /*---可用大小。----*/
-    int size2k_;
-    int size4k_;
-    int size8k_;
-    int size16k_;
     /*---已使用的大小---*/
-    int used2k_;
-    int used4k_;
-    int used8k_;
-    int used16k_;
+    int used2k_=0;
+    int used4k_=0;
+    int used8k_=0;
+    int used16k_=0;
 
-    int totalSize_;   //总大小，单位: kb
+    char*  buf2k_=nullptr;
+    char*  buf4k_=nullptr;
+    char*  buf8k_=nullptr;
+    char*  buf16k_=nullptr;
+
+    std::stack<char*>st2k_;
+    std::stack<char*>st4k_;
+    std::stack<char*>st8k_;
+    std::stack<char*>st16k_;
+    
+    int threadId_=0;
+
+
 };
 
 
@@ -34,7 +41,8 @@ class BufferPool
 {
 
 public:
-    static BuffPoolPtr init(std::vector<int>&);
+
+    BufferPool();
 
     BufferPool& operator=(const BufferPool&)=delete;
 
@@ -42,17 +50,21 @@ public:
 
     ~BufferPool();
 
-private:
+    int getBuf(char*&,int);
+    void freeBuf(char*, int);
 
-    BufferPool(std::vector<int>&);
-    
-    const std::vector<int>threadId_;
+    int changeBuf(char*&buf,int oldSize,int newSize)
+    {
+        char* temp;
+        auto realSize=getBuf(temp,newSize);
 
-    std::vector<ThreadBufMes> threadMes_; //每个注册线程的信息
-    ThreadBufMes totalMse;                //总信息
+        std::copy(buf,buf+oldSize,temp);
 
-
-    static BuffPoolPtr entity_;
+        freeBuf(buf,oldSize);
+        return realSize;
+    }
+    private:
+    ThreadBufMes localBuf_;
 };
 
 

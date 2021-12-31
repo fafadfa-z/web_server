@@ -1,4 +1,3 @@
-
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
@@ -12,9 +11,9 @@
 
 
 class TCPConnection;
-class Task;
 
-#if 0  //抽象基类，先不使用
+
+#if 0  //抽象基类，先不使�?
 class PoolFunction
 {
 public:
@@ -33,7 +32,7 @@ class ThreadPool
 public:
 
     static std::shared_ptr<ThreadPool> init(int);
-    void pushConnect(Task& task);
+    void pushConnect(const int);
 
     void begin();
 
