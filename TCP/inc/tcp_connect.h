@@ -14,9 +14,9 @@ public:
     TCPConnection(Channel*);
     ~TCPConnection();
 
-    auto readBuf(std::vector<char>&vec,size_t size)
+    auto read(char* index)
     {
-        return channel_->readBuf(vec);
+        buffer_->clear(index);
     }
 
     void send(std::string& message) {channel_->send(message);}
@@ -36,7 +36,7 @@ public:
             send(temp);
     }
 
-    void clearBuf() {buffer_->clearRead();} //舍弃所有数据
+    void clearBuf() {buffer_->clear();} //舍弃所有数据
      
     auto fd()const {return channel_->fd();}
 

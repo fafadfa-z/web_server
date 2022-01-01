@@ -27,7 +27,6 @@ namespace Http
     enum MesState
     {
         CanDeal,    //正常，来了一个消息
-        NeedMore,   //正常，但是信息没有发送全。
         MoreMes,    //正常，后面还有消息
         badMes     //错误，无法解析的消息
 
@@ -43,16 +42,18 @@ namespace Http
         {
         }
 
-        auto readMessage(TCPConnection *);
+        std::pair<MesState,char*> readMessage(TCPConnection *);
 
         void display();
 
         HttpMode request() const { return request_; }
         std::string query() const { return query_; }
 
+        void clear();
+
     private:
         bool getRequest(char *, char *);
-        bool setHttpMode(char *, char *);
+        bool setHttpMode(const char *, const char *);
         bool setHttpVersion(char *, char *);
 
         char* getHeader(char *, char *);

@@ -1,10 +1,8 @@
 #include "HttpServer.h"
 #include "server.h"
-#include "HttpRequest.h"
 #include "algorithm"
 #include "logger.h"
 #include "HttpMessage.h"
-
 #include "assert.h"
 #include "HttpDeal.h"
 
@@ -12,8 +10,8 @@ class TCPConnection;
 
 namespace Http
 {
-    const std::string HttpServer::sourcePath_=
-    "/home/fafadfa/project/webserver/web_server/HtmlFiles";
+    const std::string HttpServer::sourcePath_ =
+        "/home/fafadfa/project/webserver/web_server/HtmlFiles";
 
     HttpServer *HttpServer::entity = nullptr;
 
@@ -63,16 +61,16 @@ namespace Http
     }
 
     HttpServer::HttpServer()
-        : connCount(0),WebResources_(sourcePath_)
+        : connCount(0), WebResources_(sourcePath_)
     {
         auto address = std::make_shared<TCPAddr>("192.168.1.100", 8848);
 
         tcpServer_ = TCPServer::init(address, 1);
 
-        tcpServer_->setReadableCallBack(std::bind(&HttpServer::dealMessage,*this,std::placeholders::_1));
+        tcpServer_->setReadableCallBack(std::bind(&HttpServer::dealMessage, *this, std::placeholders::_1));
         tcpServer_->setConnectCallBack([this](TCPConnectionPtr conn) -> void
-                                        {dealConnection(conn);});
-        
+                                       { dealConnection(conn); });
+
         HttpDeal::setResource(&WebResources_);
     }
 
@@ -81,14 +79,35 @@ namespace Http
         tcpServer_->beginServer();
     }
 
-    void HttpServer::dealMessage( TCPConnection *conn)
+    void HttpServer::dealMessage(TCPConnection *conn)
     {
-        LOG_HTTP<<"Begin dealMessage..."<<log::end;
+        LOG_HTTP << "Begin dealMessage..." << log::end;
         //send_to_baidu(buf,conn->fd());
 
-        HttpRequest quest;
+        auto ret = quest_.readMessage(conn);
 
-        //auto flag = quest.readMessage(conn);
+        
+        if(ret.first==CanDeal)
+        {
+            conn->read(ret.second);
+
+            HttpDeal deal(quest_, *conn);
+
+            deal.dealQuest();
+        }
+        else if(ret.first==MoreMes)
+        {
+            conn->read(ret.second);
+        }
+        else if(ret.first==badMes)
+        {
+            quest_.clear();
+            conn->read(ret.second);
+            conn->send("HTTP/1.1 400 BadRequest\r\n\r\n");
+
+        }
+        else  LOG_FATAL << "ÒâÍâµÄ×´Ì¬¡£¡£¡£" << log::end;
+
 
         // if (flag == false)
         //     connectClose(conn);
@@ -96,15 +115,11 @@ namespace Http
         // {
         //    LOG_HTTP<<"Begin deal request..."<<log::end;
 
-        //    HttpDeal deal(quest,*conn);
-
-        //    deal.dealQuest();
-           
         //    LOG_HTTP<<"deal http ok!"<<log::end;
         // }
     }
 
-    void HttpServer::connectClose(TCPConnection* conn)
+    void HttpServer::connectClose(TCPConnection *conn)
     {
 
         LOG_HTTP << "HttpServer::connectClose" << log::end;
@@ -114,7 +129,7 @@ namespace Http
         //conn->close();
     }
 
-    void HttpServer::dealConnection(TCPConnection* conn)
+    void HttpServer::dealConnection(TCPConnection *conn)
     {
         connCount++;
     }

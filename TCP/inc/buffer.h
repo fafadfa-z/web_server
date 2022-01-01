@@ -24,7 +24,8 @@ public:
 
     bool saveReadable(int fd);
 
-    void readReadbale(std::vector<char>&);
+    void clear(char* index);  //将前面的数据移出buffer
+    void clear();             //将所有数据移除
 
     void sendMessage(std::string&&mes);
 
@@ -32,11 +33,6 @@ public:
 
     bool sendSize(int n);
 
-    void clearRead()
-    {
-        readIndex1_=0;
-        readIndex2_=0;
-    }
 
 
     static void setPool(std::shared_ptr<BufferPool>& pool){pool_=pool;}

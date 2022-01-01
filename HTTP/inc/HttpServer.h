@@ -2,7 +2,10 @@
 #define HTTP_SERVER_H
 
 #include <memory>
+#include <vector>
 #include "htmlFile.h"
+#include "HttpRequest.h"
+
 
 class TCPConnection;
 class TCPServer;
@@ -27,6 +30,10 @@ namespace Http
         void dealConnection(TCPConnection* conn);
         char *findRequest(char *start, char *end);
         void connectClose(TCPConnection* conn);
+
+    private:
+        
+        HttpRequest quest_;
 
         long connCount;  // 记录当前的连接数
  

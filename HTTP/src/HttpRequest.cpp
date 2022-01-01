@@ -9,7 +9,7 @@ namespace Http
 
     const char *RN = "\r\n\r\n";
 
-    auto HttpRequest::readMessage(TCPConnection *conn)
+    std::pair<MesState,char*> HttpRequest::readMessage(TCPConnection *conn)
     {
         LOG_HTTP << "read http message begin.." << log::end;
 
@@ -21,7 +21,7 @@ namespace Http
 
         int currentSize; //当前传过来的数据数量
 
-        int needSize; //当前还需要的数据量
+        int needSize; //当前还需要的数据�?
 
         std::map<std::string, std::string>::iterator iter;
 
@@ -30,7 +30,7 @@ namespace Http
         case empty_:
             left = findMessageHead(conn);
 
-            //如果没有找到Http请求行
+            //如果没有找到Http请求�?
             if (left == nullptr)
                 return std::pair(badMes, right);
 
@@ -53,7 +53,7 @@ namespace Http
 
         case needEntity_:
 
-            //后面没有数据了
+            //后面没有数据�?
             if (iter = headerMap_.find(std::string("Content-Length")); iter == headerMap_.end())
             {
                 LOG_HTTP << "read message without entity" << log::end;
@@ -64,12 +64,12 @@ namespace Http
 
             currentSize = right - left; //当前传过来的数据数量
 
-            needSize = size - entity_.size(); //当前还需要的数据量
+            needSize = size - entity_.size(); //当前还需要的数据�?
 
             assert(currentSize >= 0);
             assert(needSize >= 0);
 
-            if (needSize < currentSize) //发送来的数据包大于需要的数据包
+            if (needSize < currentSize) //发送来的数据包大于需要的数据�?
             {
                 entity_.append(left, left + needSize);
 
@@ -101,7 +101,7 @@ namespace Http
             index = std::search(left, right, RN, RN + 2); //寻找 \r\n
 
             if (index == right)
-                return nullptr; //没有\r\n 说明是垃圾
+                return nullptr; //没有\r\n 说明是垃�?
 
             auto ret = getRequest(left, index); //处理请求
 
@@ -138,7 +138,7 @@ namespace Http
         return false;
     }
 
-    char *HttpRequest::getHeader(char *start, char *end) //检索首部字段。
+    char *HttpRequest::getHeader(char *start, char *end) //检索首部字段�?
     {
         LOG_HTTP << "get header begin...." << log::end;
 
@@ -178,18 +178,19 @@ namespace Http
         return false;
     }
 
-    bool HttpRequest::setHttpMode(char *start, char *end)
+    bool HttpRequest::setHttpMode(const char *start, const char *end)
     {
-        std::string message(start, end);
+        
+        std::string temp(start,end);
 
-        if (message.find("GET") != -1)
+        if (temp=="GET")
         {
             request_ = Get;
             return true;
         }
-        if (message.find("POST") != -1)
+        if (temp=="POST")
         {
-            request_ = Get;
+            request_ = Post;
             return true;
         }
         return false;
@@ -223,6 +224,17 @@ namespace Http
         return "";
     }
 
+
+    void HttpRequest::clear()
+    {
+        headerMap_.clear();
+        query_.clear();
+        entity_.clear();
+        request_=Invalid;
+        version_=Unknown;
+        state_=empty_;
+    }
+
     void HttpRequest::display()
     {
         LOG_HTTP << "request: " << displayMode() << log::end;
@@ -233,5 +245,4 @@ namespace Http
             LOG_HTTP << temp.first << "\t" << temp.second << log::end;
         }
     }
-
 }

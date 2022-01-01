@@ -95,10 +95,6 @@ void Channel::close()
     poolPro_->removeFd(fd_);
 }
 
-void  Channel::readBuf(std::vector<char>&vec)
-{
-    buf_->readReadbale(vec);
-}
 
 void Channel::send(std::string &message)   //
 {

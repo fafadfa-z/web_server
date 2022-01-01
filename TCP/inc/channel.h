@@ -32,7 +32,7 @@ public:
 
     ~Channel();
 
-    void  readBuf(std::vector<char>&);
+    void  readAll(std::vector<char>&);
 
     void send(std::string& message);
 
@@ -41,6 +41,8 @@ public:
     const int events()const{return events_;}
 
     void enableWrite();
+
+    
 
     Buffer* buf() {return buf_.get();};
 

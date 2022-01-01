@@ -49,22 +49,22 @@ bool Buffer::saveReadable(int fd)
 
         // readIndex_=pool_->changeBuf(readBuf_,readIndex_,readIndex_+n); //ï¿½ï¿½ï¿½ï¿½buffer
         char *temp;
-        int preSize=ReadBufSize_;
+        int preSize = ReadBufSize_;
 
         ReadBufSize_ = pool_->getBuf(temp, resize);
 
         assert(temp != nullptr);
 
-        assert(readIndex2_-readIndex1_<=ReadBufSize_);
+        assert(readIndex2_ - readIndex1_ <= ReadBufSize_);
 
-        std::copy(readBuf_ + readIndex1_, readBuf_ + readIndex2_,temp);
+        std::copy(readBuf_ + readIndex1_, readBuf_ + readIndex2_, temp);
 
-        pool_->freeBuf(readBuf_,preSize);
+        pool_->freeBuf(readBuf_, preSize);
 
-        readIndex2_-=readIndex1_;
-        readIndex1_=0;
+        readIndex2_ -= readIndex1_;
+        readIndex1_ = 0;
 
-        readBuf_=temp;
+        readBuf_ = temp;
     }
 
     std::copy(buf, buf + n, readBuf_ + readIndex2_);
@@ -74,11 +74,24 @@ bool Buffer::saveReadable(int fd)
     return true;
 }
 
-void Buffer::readReadbale(std::vector<char> &vec)
+void Buffer::clear()
 {
-    // vec.assign(readBuf_,readBuf_+readIndex_);
+    readIndex1_ = 0;
+    readIndex2_ = 0;
+}
 
-    // readIndex_ = 0;
+void Buffer::clear(char *index)
+{    
+    if (index == readBuf_ + readIndex2_) //È«¶¼¶Á³öÀ´
+    {
+        readIndex1_ = 0;
+        readIndex2_ = 0;
+    }
+    else 
+    {
+        readIndex1_=std::distance(readBuf_,index);
+        LOG_DEBUG << "Ò»´ÎÃ»¶ÁÍê" << log::end;
+    }
 }
 
 bool Buffer::sendSendable(int fd)
@@ -99,7 +112,7 @@ bool Buffer::sendSendable(int fd)
     }
     else
     {
-        LOG_DEBUG << "Bufferï¼šéœ€è¦äºŒæ¬¡å‘ï¿½??" << log::end;
+        LOG_DEBUG << "Bufferï¼šéœ€è¦äºŒæ¬¡å‘ï¿???" << log::end;
         sendIndex1_ += n;
         return false;
     }
@@ -115,22 +128,22 @@ void Buffer::sendMessage(std::string &&mes) //ç¼“å­˜ç­‰å¾…å‘é€çš„æ•°æ®
         LOG_DEBUG << "send Buf need resize: " << resize << log::end;
 
         char *temp;
-        int preSize=SendBufSize_;
+        int preSize = SendBufSize_;
 
         SendBufSize_ = pool_->getBuf(temp, resize);
 
         assert(temp != nullptr);
 
-        assert(sendIndex2_-sendIndex1_<=SendBufSize_);
+        assert(sendIndex2_ - sendIndex1_ <= SendBufSize_);
 
-        std::copy(sendBuf_ + sendIndex1_, sendBuf_ + sendIndex2_,temp);
+        std::copy(sendBuf_ + sendIndex1_, sendBuf_ + sendIndex2_, temp);
 
-        pool_->freeBuf(readBuf_,preSize);
+        pool_->freeBuf(readBuf_, preSize);
 
-        sendIndex2_-=sendIndex1_;
-        sendIndex1_=0;
+        sendIndex2_ -= sendIndex1_;
+        sendIndex1_ = 0;
 
-        sendBuf_=temp;
+        sendBuf_ = temp;
     }
     else
     {
