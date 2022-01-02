@@ -21,7 +21,7 @@ namespace Http
 
         int currentSize; //当前传过来的数据数量
 
-        int needSize; //当前还需要的数据�?
+        int needSize; //当前还需要的数据
 
         std::map<std::string, std::string>::iterator iter;
 
@@ -30,7 +30,7 @@ namespace Http
         case empty_:
             left = findMessageHead(conn);
 
-            //如果没有找到Http请求�?
+            //如果没有找到Http请求
             if (left == nullptr)
                 return std::pair(badMes, right);
 
@@ -60,16 +60,16 @@ namespace Http
                 return std::pair(CanDeal, left);
             }
             else
-                size =::atoi(iter->second.c_str());
+            size =::atoi(iter->second.c_str());
 
             currentSize = right - left; //当前传过来的数据数量
 
-            needSize = size - entity_.size(); //当前还需要的数据�?
+            needSize = size - entity_.size(); //当前还需要的数据
 
             assert(currentSize >= 0);
             assert(needSize >= 0);
 
-            if (needSize < currentSize) //发送来的数据包大于需要的数据�?
+            if (needSize <= currentSize) //发送来的数据包大于需要的数据
             {
                 entity_.append(left, left + needSize);
 
@@ -82,10 +82,10 @@ namespace Http
                 entity_.append(left, left + currentSize);
                 return std::pair(MoreMes, right);
             }
-        case finish_:
+        case finish_:   //不应该跑到这里
 
         default: ;
-
+            LOG_FATAL<< "Unexpected state...." << log::end;
         }
         return std::pair(badMes, right);
     }

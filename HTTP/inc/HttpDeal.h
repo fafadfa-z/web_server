@@ -8,10 +8,6 @@ class TCPConnection;
 
 namespace Http
 {
-
-    #define displaySendMess  0
-    
-
     class HttpRequest;
     class WebResources;
 
@@ -22,16 +18,25 @@ namespace Http
         :quest_(quest),conn_(conn)
         {}
 
-        void dealQuest();
+        bool dealQuest();
 
         static void setResource(WebResources*);
 
     private:
+        
+        void sendBadMessage();
+
+        void readEntity(); //����ʵ�岿�ֵ����ݣ��ַ��� ����
+
+    private:
+
+        std::map<std::string,std::string> entityMap_;
+
         HttpRequest&   quest_;
         
         TCPConnection& conn_;
 
-        static WebResources* resource_;  //多线程在这里只做读取操作，应该不会出现资源竞争问题。
+        static WebResources* resource_;  //多线程在这里只做读取操作，应该不会出现资源竞争问题�?
     };
 
 }

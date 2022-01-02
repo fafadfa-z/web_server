@@ -10,39 +10,38 @@
 class TCPConnection
 {
 public:
- 
-    TCPConnection(Channel*);
+    TCPConnection(Channel *);
     ~TCPConnection();
 
-    auto read(char* index)
+    auto read(char *index)
     {
         buffer_->clear(index);
     }
 
-    void send(std::string& message) {channel_->send(message);}
+    void send(std::string &message) { channel_->send(message); }
 
-    auto buffer()const 
-    { 
-        char* const index1=buffer_->readBuf_+buffer_->readIndex1_;
-        char* const index2=buffer_->readBuf_+buffer_->readIndex2_;
+    auto buffer() const
+    {
+        char *const index1 = buffer_->readBuf_ + buffer_->readIndex1_;
+        char *const index2 = buffer_->readBuf_ + buffer_->readIndex2_;
 
-        return std::pair(index1,index2);
+        return std::pair(index1, index2);
     };
 
-    void send(const char* message)
+    void send(const char *message)
     {
-            std::string temp(message);
-            
-            send(temp);
+        std::string temp(message);
+
+        send(temp);
     }
 
-    void clearBuf() {buffer_->clear();} //舍弃所有数据
-     
-    auto fd()const {return channel_->fd();}
+    void clearBuf() { buffer_->clear(); } //舍弃所有数据
+
+    auto fd() const { return channel_->fd(); }
 
 private:
-    Channel* channel_;
-    Buffer*  buffer_;
+    Channel *channel_;
+    Buffer *buffer_;
 };
 
 #endif

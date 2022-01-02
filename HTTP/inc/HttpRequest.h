@@ -47,7 +47,8 @@ namespace Http
         void display();
 
         HttpMode request() const { return request_; }
-        std::string query() const { return query_; }
+        const std::string& query() const { return query_; }
+        const std::string& entity()const { return entity_;}
 
         void clear();
 

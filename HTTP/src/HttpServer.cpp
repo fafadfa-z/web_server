@@ -84,39 +84,37 @@ namespace Http
         LOG_HTTP << "Begin dealMessage..." << log::end;
         //send_to_baidu(buf,conn->fd());
 
-        auto ret = quest_.readMessage(conn);
+        // auto [left,right]=conn->buffer();
+        // std::string temp(left,right);
 
-        
-        if(ret.first==CanDeal)
+        // std::cout<<std::endl<<"receive size: "<<temp.size()<<std::endl;
+        // std::cout<<temp;
+
+        auto [status, index] = quest_.readMessage(conn);  //处理消息，判断消息格式的正确性
+
+        if(status==CanDeal)  //收到一条完整的消息
         {
-            conn->read(ret.second);
+            conn->read(index);
 
             HttpDeal deal(quest_, *conn);
 
-            deal.dealQuest();
+            deal.dealQuest(); //处理消息
+            quest_.clear();
+
         }
-        else if(ret.first==MoreMes)
+        else if(status==MoreMes)  //格式正确，但是消息不完全
         {
-            conn->read(ret.second);
+            conn->read(index);
         }
-        else if(ret.first==badMes)
+        else if(status==badMes)   //格式错误
         {
             quest_.clear();
-            conn->read(ret.second);
+            conn->read(index);
             conn->send("HTTP/1.1 400 BadRequest\r\n\r\n");
 
         }
         else  LOG_FATAL << "意外的状态。。。" << log::end;
 
-
-        // if (flag == false)
-        //     connectClose(conn);
-        // else
-        // {
-        //    LOG_HTTP<<"Begin deal request..."<<log::end;
-
-        //    LOG_HTTP<<"deal http ok!"<<log::end;
-        // }
     }
 
     void HttpServer::connectClose(TCPConnection *conn)

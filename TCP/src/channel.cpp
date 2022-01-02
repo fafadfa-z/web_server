@@ -34,7 +34,7 @@ void Channel::dealEvent(epoll_event &event)
          isDeal = true;
     }
 
-    if (event.events & (POLLIN)) //这个不能放在第一个，如果放在第一个则可能在写操作执行之前关闭端口
+    if ((event.events & POLLIN) || !buf_->empty()) //这个不能放在第一个，如果放在第一个则可能在写操作执行之前关闭端口
     {
         if (fd_==poolPro_->weakUpFd()) // weakup 情况
         {

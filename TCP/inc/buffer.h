@@ -33,7 +33,7 @@ public:
 
     bool sendSize(int n);
 
-
+    bool empty(){return readIndex1_==readIndex2_;}
 
     static void setPool(std::shared_ptr<BufferPool>& pool){pool_=pool;}
 

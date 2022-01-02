@@ -44,6 +44,8 @@ public:
 
     
 
+    
+
     Buffer* buf() {return buf_.get();};
 
     static void setPoolPro(std::shared_ptr<PoolProcess>pro);
