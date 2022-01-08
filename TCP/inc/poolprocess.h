@@ -23,7 +23,7 @@ class Channel;
 
 #define NEW_PLAYER 1
 
-class  FdPack  //为了防止管道粘包，封包和拆宝�?
+class  FdPack  //为了防止管道粘包，封包和拆宝�?
 {
     FdPack(int fd=-1)
     {
@@ -75,7 +75,7 @@ public:
 
     void pushConnect(const int fd)
     {
-        LOG_INFO<< "PoolProcess::pushConnect" << fd << "   epollfd:" << epollFd_ << log::end;
+        LOG_INFO<< "PoolProcess::pushConnect" << fd << "   epollfd:" << epollFd_ << Log::end;
         weakup(fd);
     }
 

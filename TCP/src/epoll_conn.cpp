@@ -31,7 +31,7 @@ void EpollConnect::acceptLoop()
     {
         if (messageSize > 1)
         {
-            LOG_DEBUG << "more than one player.. " << messageSize << log::end;
+            LOG_DEBUG << "more than one player.. " << messageSize << Log::end;
         }
         else
             for (int i = 0; i < messageSize; i++)
@@ -53,18 +53,18 @@ void EpollConnect::acceptLoop()
 
                 nums++;
 
-                LOG_FATAL << "new player socket: " << connfd << " ip: " << ip << " port: " << port << " nums: " << nums << log::end;
+                LOG_FATAL << "new player socket: " << connfd << " ip: " << ip << " port: " << port << " nums: " << nums << Log::end;
 
                 submitCallBack_(connfd); //回调服务器类
             }
     }
     else if (messageSize == 0)
     {
-        // LOG_INFO << "no player join..." << log::end;
+        // LOG_INFO << "no player join..." << Log::end;
     }
     else
     {
-        LOG_FATAL << "errno: " << strerror(errno) << log::end;
+        LOG_FATAL << "errno: " << strerror(errno) << Log::end;
     }
 }
 

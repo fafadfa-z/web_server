@@ -12,7 +12,7 @@ static constexpr int buf16kNum = 200;
 BufferPool::BufferPool()
 {
     localBuf_.threadId_ = getTid();
-    /*--------------------------ÉêÇëÄÚ´æ---------------------*/
+    /*--------------------------ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½---------------------*/
     localBuf_.buf2k_ = (char *)::malloc(buf2kNum * 2 * 1024);
 
     assert(localBuf_.buf2k_ != nullptr);
@@ -102,7 +102,7 @@ int BufferPool::getBuf(char *&buf, int size)
         localBuf_.st16k_.pop();
         localBuf_.used16k_++;
     }
-    LOG_INFO<<"get buffer size: "<<size<<"index: "<<buf<<log::end;
+    LOG_INFO<<"get buffer size: "<<size<<"index: "<<buf<<Log::end;
     
     return ans;
 }
@@ -110,7 +110,7 @@ void BufferPool::freeBuf(char *buf, int size)
 {
     ::memset(buf, 0, size);
 
-    LOG_INFO<<"free buffer size: "<<size<<"index: "<<buf<<log::end;
+    LOG_INFO<<"free buffer size: "<<size<<"index: "<<buf<<Log::end;
 
     if (size <= buf2kNum)
     {

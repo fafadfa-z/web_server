@@ -81,7 +81,7 @@ namespace Http
 
     void HttpServer::dealMessage(TCPConnection *conn)
     {
-        LOG_HTTP << "Begin dealMessage..." << log::end;
+        LOG_HTTP << "Begin dealMessage..." << Log::end;
         //send_to_baidu(buf,conn->fd());
 
         // auto [left,right]=conn->buffer();
@@ -90,37 +90,37 @@ namespace Http
         // std::cout<<std::endl<<"receive size: "<<temp.size()<<std::endl;
         // std::cout<<temp;
 
-        auto [status, index] = quest_.readMessage(conn);  //´¦ÀíÏûÏ¢£¬ÅÐ¶ÏÏûÏ¢¸ñÊ½µÄÕýÈ·ÐÔ
+        auto [status, index] = quest_.readMessage(conn);  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½
 
-        if(status==CanDeal)  //ÊÕµ½Ò»ÌõÍêÕûµÄÏûÏ¢
+        if(status==CanDeal)  //ï¿½Õµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
         {
             conn->read(index);
 
             HttpDeal deal(quest_, *conn);
 
-            deal.dealQuest(); //´¦ÀíÏûÏ¢
+            deal.dealQuest(); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
             quest_.clear();
 
         }
-        else if(status==MoreMes)  //¸ñÊ½ÕýÈ·£¬µ«ÊÇÏûÏ¢²»ÍêÈ«
+        else if(status==MoreMes)  //ï¿½ï¿½Ê½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½È«
         {
             conn->read(index);
         }
-        else if(status==badMes)   //¸ñÊ½´íÎó
+        else if(status==badMes)   //ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½
         {
             quest_.clear();
             conn->read(index);
             conn->send("HTTP/1.1 400 BadRequest\r\n\r\n");
 
         }
-        else  LOG_FATAL << "ÒâÍâµÄ×´Ì¬¡£¡£¡£" << log::end;
+        else  LOG_FATAL << "ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" << Log::end;
 
     }
 
     void HttpServer::connectClose(TCPConnection *conn)
     {
 
-        LOG_HTTP << "HttpServer::connectClose" << log::end;
+        LOG_HTTP << "HttpServer::connectClose" << Log::end;
 
         conn->send("HTTP/1.1 400 BadRequest\r\n\r\n");
 

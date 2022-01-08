@@ -8,7 +8,7 @@ std::shared_ptr<TCPServer> TCPServer::init(TcpAddrPtr listenAddr, int num) //创
 {
     if (!entity_)
     {
-        LOG_DEBUG << "创建 TCPserver" << log::end;
+        LOG_DEBUG << "创建 TCPserver" << Log::end;
         entity_.reset(new TCPServer(listenAddr, num));
     }
     return entity_;
@@ -24,7 +24,7 @@ TCPServer::TCPServer(TcpAddrPtr listenAddr, int threadNum)
 
 void TCPServer::beginServer()
 {
-    LOG_DEBUG << "Server begin......." << log::end;
+    LOG_DEBUG << "Server begin......." << Log::end;
 
     Channel::setServer(this);
 
@@ -38,7 +38,7 @@ void TCPServer::beginServer()
 // 处理新连接,
 void TCPServer::connNew(Channel *channel)
 {
-    LOG_INFO << "TCPServer::newConnection： " << channel->fd() << "   " << log::end;
+    LOG_INFO << "TCPServer::newConnection： " << channel->fd() << "   " << Log::end;
 
     TCPConnection connection(channel);
 
@@ -48,7 +48,7 @@ void TCPServer::connNew(Channel *channel)
 
 void TCPServer::connReadable(Channel *channel)
 {
-    LOG_INFO << "connection can be read!" << log::end;
+    LOG_INFO << "connection can be read!" << Log::end;
 
     TCPConnection connection(channel);
 
@@ -58,7 +58,7 @@ void TCPServer::connReadable(Channel *channel)
 
 // void TCPServer::removeConnection(std::string index)
 // {
-// LOG_DEBUG<<"TCP Server remove connection..."<<log::end;
+// LOG_DEBUG<<"TCP Server remove connection..."<<Log::end;
 
 // std::lock_guard<std::mutex>guard(mut_);
 // {
@@ -70,11 +70,11 @@ void TCPServer::connReadable(Channel *channel)
 // }
 // if(CloseCallBack_) CloseCallBack_();
 
-//  LOG_DEBUG<<"TCP Server remove ok"<<log::end;
+//  LOG_DEBUG<<"TCP Server remove ok"<<Log::end;
 
 // }
 
 TCPServer::~TCPServer()
 {
-    LOG_DEBUG << "TCP Server析构..." << log::end;
+    LOG_DEBUG << "TCP Server析构..." << Log::end;
 }

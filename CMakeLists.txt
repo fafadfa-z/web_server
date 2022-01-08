@@ -8,6 +8,8 @@ include_directories(log/inc)
 include_directories(time/inc)
 include_directories(HTTP/inc)
 include_directories(base/inc)
+include_directories(mysql/inc)
+
 include_directories(mysql-connector/include)
 
 aux_source_directory(TCP/src DIR_SRCS)
@@ -15,9 +17,11 @@ aux_source_directory(log/src DIR_SRCS)
 aux_source_directory(time/src DIR_SRCS)
 aux_source_directory(HTTP/src DIR_SRCS)
 aux_source_directory(base/src DIR_SRCS)
+aux_source_directory(mysql/src DIR_SRCS)
 
 
 LINK_DIRECTORIES(mysql-connector/lib) 
+LINK_DIRECTORIES(/usr/local/lib64)
 
 link_libraries("pthread" "mysqlclient")
 

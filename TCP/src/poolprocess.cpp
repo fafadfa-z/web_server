@@ -56,11 +56,11 @@ void PoolProcess::distribute()
     }
     else if (messageSize == 0)
     {
-        //LOG_INFO << "线程空闲" << log::end;
+        //LOG_INFO << "线程空闲" << Log::end;
     }
     else 
     {   
-        LOG_FATAL << "messageSize<0 !" << log::end;
+        LOG_FATAL << "messageSize<0 !" << Log::end;
     }
 
 }
@@ -85,7 +85,7 @@ void PoolProcess::insertToEpoll(const std::shared_ptr<Channel>& channel)  //这�
 
 void PoolProcess::removeFd(int fd)          //这个函数是事件处理线程调用的�?
 {
-    LOG_DEBUG << "removeFd: " << fd << log::end;
+    LOG_DEBUG << "removeFd: " << fd << Log::end;
 
     auto iter = channelMap_.find(fd);
 
@@ -100,7 +100,7 @@ void PoolProcess::removeFd(int fd)          //这个函数是事件处理线程�
 
 void PoolProcess::changeEvent(int event, int fd)
 {
-    //LOG_INFO << "Change event  fd=" << fd << " event= " << event << log::end;
+    //LOG_INFO << "Change event  fd=" << fd << " event= " << event << Log::end;
     epoll_event new_event;
 
     new_event.events = event;
@@ -110,14 +110,14 @@ void PoolProcess::changeEvent(int event, int fd)
     auto res = epoll_ctl(epollFd_, EPOLL_CTL_MOD, fd, &new_event);
 
     if (res == -1)
-    LOG_FATAL << "Change event error" << log::end;
+    LOG_FATAL << "Change event error" << Log::end;
 }
 
 #include <errno.h>
 
 void PoolProcess::weakup(int mes)
 {
-    LOG_INFO<<"process weak up!"<<mes<<log::end;
+    LOG_INFO<<"process weak up!"<<mes<<Log::end;
 
     int fd=mes;
 
@@ -136,7 +136,7 @@ void PoolProcess::receiveWeakup()
     assert(n == sizeof(mes));
     assert(mes!=-1);
 
-    LOG_INFO<<"new fd: "<<mes<<log::end;
+    LOG_INFO<<"new fd: "<<mes<<Log::end;
 
     std::shared_ptr<Buffer>buf(std::make_shared<Buffer>());
     std::shared_ptr<Channel>channel(std::make_shared<Channel>(mes,buf));
@@ -148,5 +148,5 @@ void PoolProcess::receiveWeakup()
 
 PoolProcess::~PoolProcess()
 {
-    LOG_DEBUG << "PoolProcess 析构" << log::end;
+    LOG_DEBUG << "PoolProcess 析构" << Log::end;
 }

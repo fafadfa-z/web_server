@@ -15,7 +15,7 @@ LocalMassage *LocalMassage::init(const std::string &settingPath)
 {
     if (!entity_)
     {
-        LOG_DEBUG<<"init local message..."<<log::end;
+        LOG_DEBUG<<"init local message..."<<Log::end;
         entity_ = new LocalMassage(settingPath);
     }
     return entity_;

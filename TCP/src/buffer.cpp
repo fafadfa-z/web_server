@@ -24,14 +24,14 @@ Buffer::~Buffer()
     pool_->freeBuf(readBuf_, ReadBufSize_);
     pool_->freeBuf(sendBuf_, SendBufSize_);
 
-    LOG_INFO << "buffer 析构" << log::end;
+    LOG_INFO << "buffer 析构" << Log::end;
 }
 
 bool Buffer::saveReadable(int fd)
 {
     char buf[readSize_] = {0};
 
-    LOG_INFO << "read begin: fd=" << fd << log::end;
+    LOG_INFO << "read begin: fd=" << fd << Log::end;
 
     auto n = ::recv(fd, buf, readSize_ - 1, 0);
 
@@ -39,13 +39,13 @@ bool Buffer::saveReadable(int fd)
         return false;
 
     if (readIndex1_)
-        LOG_DEBUG << "writeIndex1_: " << readIndex1_ << log::end;
+        LOG_DEBUG << "writeIndex1_: " << readIndex1_ << Log::end;
 
     if (readIndex2_ + n > ReadBufSize_)
     {
 
         int resize = readIndex2_ - readIndex1_ + 1 + n;
-        LOG_DEBUG << "read Buf need resize: " << resize << log::end;
+        LOG_DEBUG << "read Buf need resize: " << resize << Log::end;
 
         // readIndex_=pool_->changeBuf(readBuf_,readIndex_,readIndex_+n); //����buffer
         char *temp;
@@ -82,7 +82,7 @@ void Buffer::clear()
 
 void Buffer::clear(char *index)
 {    
-    if (index == readBuf_ + readIndex2_) //ȫ��������
+    if (index == readBuf_ + readIndex2_) //ȫ��������
     {
         readIndex1_ = 0;
         readIndex2_ = 0;
@@ -90,7 +90,7 @@ void Buffer::clear(char *index)
     else 
     {
         readIndex1_=std::distance(readBuf_,index);
-        LOG_DEBUG << "һ��û����" << log::end;
+        LOG_DEBUG << "һ��û����" << Log::end;
     }
 }
 
@@ -104,7 +104,7 @@ bool Buffer::sendSendable(int fd)
 
     if (n == size)
     {
-        LOG_INFO << "Buffer：发送完成！" << log::end;
+        LOG_INFO << "Buffer：发送完成！" << Log::end;
         sendIndex1_ = 0;
         sendIndex2_ = 0;
 
@@ -112,7 +112,7 @@ bool Buffer::sendSendable(int fd)
     }
     else
     {
-        LOG_DEBUG << "Buffer：需要二次发�???" << log::end;
+        LOG_DEBUG << "Buffer：需要二次发�???" << Log::end;
         sendIndex1_ += n;
         return false;
     }
@@ -125,7 +125,7 @@ void Buffer::sendMessage(std::string &&mes) //缓存等待发送的数据
     {
         int resize = sendIndex2_ - sendIndex1_ + 1 + n;
 
-        LOG_DEBUG << "send Buf need resize: " << resize << log::end;
+        LOG_DEBUG << "send Buf need resize: " << resize << Log::end;
 
         char *temp;
         int preSize = SendBufSize_;

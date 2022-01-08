@@ -3,7 +3,7 @@
 
 #include "string.h"
 
-namespace log
+namespace Log
 {
 
     const int bufferSize = 256;
@@ -39,6 +39,6 @@ namespace log
         static thread_local int writeIndex_;
     };
 
-} //namespace log
+} //namespace Log
 
 #endif

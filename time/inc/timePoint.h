@@ -5,6 +5,7 @@
 #include <chrono>
 #include "logger.h"
 
+
 namespace Time
 {
     const int usTos = 1000'000; //微妙到秒的进制转换
@@ -54,7 +55,7 @@ namespace Time
 
             auto timeCost=duration_cast<microseconds>(endTime - beginTime_).count();
 
-            LOG_DEBUG<<logMes_<<" cost time: "<<timeCost<<" us"<<log::end;
+            LOG_DEBUG<<logMes_<<" cost time: "<<timeCost<<" us"<<Log::end;
         }
 
     private:

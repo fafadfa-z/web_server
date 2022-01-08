@@ -4,7 +4,7 @@
 #include "assert.h"
 #include <iostream>
 
-namespace log
+namespace Log
 {
     LogThread *entity = nullptr;
 

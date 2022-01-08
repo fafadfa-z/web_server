@@ -17,12 +17,12 @@ namespace Http
         {
             if (isOpen())
             {
-                read(buf_);
+                 Base::FileRead::read(buf_);
 
-                LOG_HTTP << "Read html file success! read size: " << buf_.size() << "  " << path<<log::end;
+                LOG_HTTP << "Read html file success! read size: " << buf_.size() << "  " << path<<Log::end;
             }
             else
-                LOG_HTTP << "Read html file file error... " << path << log::end;
+                LOG_HTTP << "Read html file file error... " << path << Log::end;
         }
 
         ~HtmlFile()

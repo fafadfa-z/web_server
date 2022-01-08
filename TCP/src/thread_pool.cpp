@@ -19,7 +19,7 @@ std::shared_ptr<ThreadPool> ThreadPool::init(int threadNum)
 
 void ThreadPool::begin()
 {
-    LOG_DEBUG<<"Thread pool begin!  threadNum:"<<threadNum_<<log::end;
+    LOG_DEBUG<<"Thread pool begin!  threadNum:"<<threadNum_<<Log::end;
 
     std::vector<std::thread::id>idVec;
  
@@ -48,6 +48,6 @@ void ThreadPool::pushConnect(const int fd)
 
 ThreadPool::~ThreadPool()
 {
-    LOG_DEBUG<<"ThreadPool 析构"<<log::end;
+    LOG_DEBUG<<"ThreadPool 析构"<<Log::end;
 
 }

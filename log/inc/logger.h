@@ -7,7 +7,7 @@
 
 
 
-namespace log
+namespace Log
 {
   extern LogThread *entity;
  
@@ -46,31 +46,31 @@ namespace log
     static const int maxNameSize = 25; //文件名等缓冲区的最大容量
   };
 
-       LogStream& end(LogStream& stream);
+  LogStream& end(LogStream& stream);
 
-}  // namespace log
+}  // namespace Log
 
 const bool enableDebug = 1;
 
 const bool enableHttpDebug = 1;
 
-const log::LogLevel logLevel = log::LogLevel::DEBUG_;
+const Log::LogLevel logLevel = Log::LogLevel::DEBUG_;
 
 #define LOG_INFO                        \
-  if (logLevel <= log::LogLevel::INFO_) \
-  log::entity->logger->receive(__FILE__, __LINE__, __func__, log::INFO_)
+  if (logLevel <= Log::LogLevel::INFO_) \
+  Log::entity->logger->receive(__FILE__, __LINE__, __func__, Log::INFO_)
 
 #define LOG_DEBUG                        \
-  if (logLevel <= log::LogLevel::DEBUG_) \
-  log::entity->logger->receive(__FILE__, __LINE__, __func__, log::DEBUG_)
+  if (logLevel <= Log::LogLevel::DEBUG_) \
+  Log::entity->logger->receive(__FILE__, __LINE__, __func__, Log::DEBUG_)
 
 #define LOG_FATAL                        \
-  if (logLevel <= log::LogLevel::FATAL_) \
-  log::entity->logger->receive(__FILE__, __LINE__, __func__, log::FATAL_)
+  if (logLevel <= Log::LogLevel::FATAL_) \
+  Log::entity->logger->receive(__FILE__, __LINE__, __func__, Log::FATAL_)
 
 #define LOG_HTTP       \
   if (enableHttpDebug) \
-  log::entity->logger->receive(__FILE__, __LINE__, __func__, log::HTTP_)
+  Log::entity->logger->receive(__FILE__, __LINE__, __func__, Log::HTTP_)
 
 #define LOG_COUT std::cout
 

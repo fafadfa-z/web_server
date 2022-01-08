@@ -11,7 +11,7 @@ namespace Http
 
     std::pair<MesState,char*> HttpRequest::readMessage(TCPConnection *conn)
     {
-        LOG_HTTP << "read http message begin.." << log::end;
+        LOG_HTTP << "read http message begin.." << Log::end;
 
         auto [left, right] = conn->buffer();
 
@@ -56,7 +56,7 @@ namespace Http
             //后面没有数据�?
             if (iter = headerMap_.find(std::string("Content-Length")); iter == headerMap_.end())
             {
-                LOG_HTTP << "read message without entity" << log::end;
+                LOG_HTTP << "read message without entity" << Log::end;
                 return std::pair(CanDeal, left);
             }
             else
@@ -85,7 +85,7 @@ namespace Http
         case finish_:   //不应该跑到这里
 
         default: ;
-            LOG_FATAL<< "Unexpected state...." << log::end;
+            LOG_FATAL<< "Unexpected state...." << Log::end;
         }
         return std::pair(badMes, right);
     }
@@ -140,7 +140,7 @@ namespace Http
 
     char *HttpRequest::getHeader(char *start, char *end) //检索首部字段�?
     {
-        LOG_HTTP << "get header begin...." << log::end;
+        LOG_HTTP << "get header begin...." << Log::end;
 
         char *indexStart = start, *indexEnd = start;
 
@@ -237,12 +237,12 @@ namespace Http
 
     void HttpRequest::display()
     {
-        LOG_HTTP << "request: " << displayMode() << log::end;
-        LOG_HTTP << "version: " << displayVersion() << log::end;
+        LOG_HTTP << "request: " << displayMode() << Log::end;
+        LOG_HTTP << "version: " << displayVersion() << Log::end;
 
         for (auto temp : headerMap_)
         {
-            LOG_HTTP << temp.first << "\t" << temp.second << log::end;
+            LOG_HTTP << temp.first << "\t" << temp.second << Log::end;
         }
     }
 }

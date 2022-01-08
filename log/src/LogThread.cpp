@@ -7,7 +7,7 @@
 #include <assert.h>
 #include "logger.h"
 
-namespace log
+namespace Log
 {
 
     const char *logPath = "/home/fafadfa/log/";
@@ -99,7 +99,7 @@ namespace log
 
             if (bufToWrite_.size() > 2)
             {
-                std::cout << "Log system: too many log...\n";
+                std::cout << "Log system: too many Log...\n";
 
                 bufToWrite_.erase(bufToWrite_.begin() + 2, bufToWrite_.end());
             }
@@ -136,4 +136,4 @@ namespace log
         buf.clear();
     }
 
-} // namespace log
+} // namespace Log

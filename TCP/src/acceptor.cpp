@@ -31,14 +31,14 @@ void acceptor::Loop()
 {
     looping_=true;
     
-    LOG_DEBUG << "acceptor listen begin......." << log::end;
+    LOG_DEBUG << "acceptor listen begin......." << Log::end;
 
     while(looping_)
     {
         acceptLoop();
     }
     
-    LOG_DEBUG << "acceptor listen end......." << log::end;
+    LOG_DEBUG << "acceptor listen end......." << Log::end;
 }
 int  acceptor::createListenSocket()
 {
@@ -67,7 +67,7 @@ int  acceptor::createListenSocket()
 
     assert(res != -1);
 
-    LOG_DEBUG << "creeate socket success！" << log::end;
+    LOG_DEBUG << "creeate socket success！" << Log::end;
 
     return soc;
 }
@@ -79,6 +79,6 @@ acceptor::~acceptor()
 
     ::close(listenFd_);
 
-    LOG_DEBUG << "虚基类析构"<< log::end;
+    LOG_DEBUG << "虚基类析构"<< Log::end;
 }
 

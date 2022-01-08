@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <assert.h>
-
+#include <filesystem>
 #include "htmlFile.h"
 
 namespace Http
@@ -14,11 +14,32 @@ namespace Http
     {
         findFile(resoutcePath);
 
-        LOG_HTTP << "Find " << num_ << " HTML files.." << log::end;
+        LOG_HTTP << "Find " << num_ << " HTML files.." << Log::end;
     }
 
-    void WebResources::findFile(const std::string &path)
+    void WebResources::findFile(const std::string &pathStr)
     {
+        std::cout << "pathStr: " <<pathStr<< std::endl;
+
+        std::filesystem::directory_entry direct(pathStr.c_str());
+
+        assert(direct.is_directory());
+
+        for (const auto &entry : std::filesystem::recursive_directory_iterator(direct))
+        {
+            if (entry.is_regular_file())
+            {
+                HtmlFile *file = new HtmlFile(entry.path());  //path 可以隐式转换成 string 
+
+                //insertToMap(file, dp->d_name);
+
+                num_++;
+
+                std::cout << "Find resource: " << entry << std::endl;
+            }
+        }
+
+#if 0
         struct stat st;
         auto res1 = ::stat(path.c_str(), &st); //检测路径是否合法
 
@@ -48,11 +69,12 @@ namespace Http
 
             num_++;
 
-            LOG_HTTP << "Find resource: " << dir << log::end;
+            LOG_HTTP << "Find resource: " << dir << Log::end;
 
             //file->display();
         }
         ::closedir(dir);
+#endif
     }
 
     void WebResources::insertToMap(HtmlFile *file, const char *path)

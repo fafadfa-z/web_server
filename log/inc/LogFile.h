@@ -5,7 +5,7 @@
 #include <sys/types.h>
 
 
-namespace log
+namespace Log
 {
     class LogFile
     {

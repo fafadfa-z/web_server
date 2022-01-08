@@ -4,6 +4,7 @@
 #include "htmlFile.h"
 #include "server.h"
 #include "assert.h"
+#include "mysqlBuf.h"
 
 namespace Http
 {
@@ -14,7 +15,7 @@ namespace Http
         resource_ = resource;
     }
 
-    bool HttpDeal::dealQuest() //´¦ÀíÇëÇóµÄÖ÷º¯Êý
+    bool HttpDeal::dealQuest() //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
 
         auto file = resource_->findHtml(quest_.query());
@@ -34,21 +35,26 @@ namespace Http
 
             mes = message.dealMessage("ok", file->buf());
 
-            LOG_HTTP << "send size:" << mes.size() << log::end;
+            LOG_HTTP << "send size:" << mes.size() << Log::end;
 
             conn_.send(mes);
 
             return true;
         case Post:
 
-            readEntity(); //ÌáÈ¡Êý¾Ý
+            readEntity(); //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
 
             if (entityMap_.find("register")!=entityMap_.end())
             {
+                
+
+
 
             }
             else if (entityMap_.find("sign in")!=entityMap_.end())
             {
+
+
             }
 
             return true;
@@ -93,7 +99,7 @@ namespace Http
         message.addHeader("Server", "fafadfa");
         auto mes = message.dealMessage("not found", "");
         conn_.send(mes);
-        LOG_HTTP << "error: cannot find request files: " << quest_.query() << log::end;
+        LOG_HTTP << "error: cannot find request files: " << quest_.query() << Log::end;
     }
 
 }

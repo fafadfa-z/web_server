@@ -25,7 +25,7 @@ void Channel::dealEvent(epoll_event &event)
 
     if (event.events & POLLOUT)
     {
-        LOG_INFO<<"re send begin..."<<log::end;
+        LOG_INFO<<"re send begin..."<<Log::end;
 
         auto flag=buf_->sendSendable(fd_);
 
@@ -60,11 +60,11 @@ void Channel::dealEvent(epoll_event &event)
     }
     if (event.events & (EPOLLHUP | POLLRDHUP))
     {
-        LOG_FATAL << "client want to leave...." << log::end;
+        LOG_FATAL << "client want to leave...." << Log::end;
     }
     if (isDeal == false)
     {
-        LOG_FATAL << "other message:  " << event.events << log::end;
+        LOG_FATAL << "other message:  " << event.events << Log::end;
     }
     event.events = 0;
     event.data.fd = 0;
@@ -72,7 +72,7 @@ void Channel::dealEvent(epoll_event &event)
 
 void Channel::enableWrite()
 {
-    LOG_INFO << "channel: " << fd_ << "  enable write..." << log::end;
+    LOG_INFO << "channel: " << fd_ << "  enable write..." << Log::end;
     assert(!(events_ & POLLOUT));
 
     events_ |= POLLOUT;
@@ -82,7 +82,7 @@ void Channel::enableWrite()
 
 void Channel::disableWrite()
 {
-    LOG_INFO << "channel: " << fd_ << "  disable write..." << log::end;
+    LOG_INFO << "channel: " << fd_ << "  disable write..." << Log::end;
     assert(events_ & POLLOUT);
 
     events_ &= 0b1111'1111'1011;
@@ -105,5 +105,5 @@ void Channel::send(std::string &message)   //
 
 Channel::~Channel()
 {
-    LOG_DEBUG << "channel 析构" << fd_ << log::end;
+    LOG_DEBUG << "channel 析构" << fd_ << Log::end;
 }

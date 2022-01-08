@@ -5,7 +5,7 @@
 #include <string>
 #include <functional>
 
-namespace log
+namespace Log
 {
    
 
@@ -62,6 +62,6 @@ namespace log
     };
 
 
-} // namespace log
+} // namespace Log
 
 #endif

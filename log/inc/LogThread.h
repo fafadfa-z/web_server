@@ -6,10 +6,11 @@
 #include <thread>
 #include <mutex>
 #include <iostream>
+#include <memory>
 
 #include "LogFile.h"
 
-namespace log
+namespace Log
 {
 
     class Logger;

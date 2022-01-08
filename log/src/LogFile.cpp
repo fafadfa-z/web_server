@@ -12,7 +12,7 @@
 //     return strerror_r(savedErrno, t_errnobuf, sizeof t_errnobuf);
 // }
 
-namespace log
+namespace Log
 {
     LogFile::LogFile(const char *fileName)
         : maxSizePreFile_(100 * 1024 * 1024), // 100Mb
@@ -68,7 +68,7 @@ namespace log
         writeBytes_ += written;
         if (writeBytes_ > maxSizePreFile_)
         {
-            std::cout<<"change log file....\n";
+            std::cout<<"change Log file....\n";
             changeFile();
         }
     }

@@ -15,5 +15,5 @@ TCPConnection::TCPConnection(Channel* channel)
 
 TCPConnection::~TCPConnection()
 {
-    LOG_DEBUG << "tcp connection 析构..."<<log::end;
+    LOG_DEBUG << "tcp connection 析构..."<<Log::end;
 }

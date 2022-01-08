@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace log
+namespace Log
 {
     
     const int LogStream::maxNumSize=48;
