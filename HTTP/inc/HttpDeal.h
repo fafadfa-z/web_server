@@ -5,6 +5,7 @@
 #include <map>
 
 class TCPConnection;
+class HtmlFile;
 
 namespace Http
 {
@@ -26,7 +27,9 @@ namespace Http
         
         void sendBadMessage();
 
-        void readEntity(); //处理实体部分的数据（字符串 ）。
+        void readEntity(); //读取HTTP报文的实体信息
+
+        void sendFile(const std::string&);  //发送w
 
     private:
 
@@ -36,7 +39,7 @@ namespace Http
         
         TCPConnection& conn_;
 
-        static WebResources* resource_;  //澶氱嚎绋嬪湪杩欓噷鍙仛璇诲彇鎿嶄綔锛屽簲璇ヤ笉浼氬嚭鐜拌祫婧愮珵浜夐棶棰樸�?
+        static WebResources* resource_;  //澶氱嚎绋嬪湪杩欓噷鍙?鍋氳?诲彇鎿嶄綔锛屽簲璇ヤ笉浼氬嚭鐜拌祫婧愮珵浜夐棶棰橈拷?
     };
 
 }

@@ -8,18 +8,16 @@ namespace MySql_
 {
     class MySqlBuf
     {
+    public:
         MySqlBuf();
 
-       const webMes searchPlayer(const std::string&);
+        const webMes searchPlayer(const std::string &);
 
-       bool newPlayer(const std::string&,const std::string&);
+        bool newPlayer(const std::string &, const std::string &);
 
     private:
-        inline static thread_local SqlMess* conn_=nullptr;
+        inline static thread_local SqlMess *conn_ = nullptr;
     };
 }
-
-
-
 
 #endif

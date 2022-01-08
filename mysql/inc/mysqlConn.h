@@ -19,6 +19,7 @@ namespace MySql_
 
     struct webMes
     {
+        
         webMes(const std::vector<std::string>&mes)
         :   id_(::atoi(mes[0].c_str())),
             name_(mes[1]),

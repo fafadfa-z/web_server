@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <assert.h>
-#include <filesystem>
+
 #include "htmlFile.h"
 
 namespace Http
@@ -17,29 +17,8 @@ namespace Http
         LOG_HTTP << "Find " << num_ << " HTML files.." << Log::end;
     }
 
-    void WebResources::findFile(const std::string &pathStr)
+    void WebResources::findFile(const std::string &path)
     {
-        std::cout << "pathStr: " <<pathStr<< std::endl;
-
-        std::filesystem::directory_entry direct(pathStr.c_str());
-
-        assert(direct.is_directory());
-
-        for (const auto &entry : std::filesystem::recursive_directory_iterator(direct))
-        {
-            if (entry.is_regular_file())
-            {
-                HtmlFile *file = new HtmlFile(entry.path());  //path 可以隐式转换成 string 
-
-                //insertToMap(file, dp->d_name);
-
-                num_++;
-
-                std::cout << "Find resource: " << entry << std::endl;
-            }
-        }
-
-#if 0
         struct stat st;
         auto res1 = ::stat(path.c_str(), &st); //检测路径是否合法
 
@@ -67,6 +46,8 @@ namespace Http
 
             insertToMap(file, dp->d_name);
 
+
+
             num_++;
 
             LOG_HTTP << "Find resource: " << dir << Log::end;
@@ -74,7 +55,6 @@ namespace Http
             //file->display();
         }
         ::closedir(dir);
-#endif
     }
 
     void WebResources::insertToMap(HtmlFile *file, const char *path)
@@ -92,11 +72,15 @@ namespace Http
                 ans[i] = path[i];
         }
         files_[ans] = std::shared_ptr<HtmlFile>(file);
+
+        std::cout<<std::endl<<"insert file: "<<ans<<std::endl;
     }
 
     std::shared_ptr<const HtmlFile> WebResources::findHtml(const std::string &name) const
     {
         auto iter = files_.find(name);
+
+        
         if (iter == files_.end())
             return std::shared_ptr<const HtmlFile>(nullptr);
 

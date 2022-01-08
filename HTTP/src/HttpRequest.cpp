@@ -237,8 +237,8 @@ namespace Http
 
     void HttpRequest::display()
     {
-        LOG_HTTP << "request: " << displayMode() << Log::end;
-        LOG_HTTP << "version: " << displayVersion() << Log::end;
+        std::cout << "request: " << displayMode() << std::endl;
+        std::cout << "version: " << displayVersion() << std::endl;
 
         for (auto temp : headerMap_)
         {

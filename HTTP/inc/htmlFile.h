@@ -31,7 +31,7 @@ namespace Http
         }
 
         void display() { LOG_COUT << "html files:\n"
-                                   << buf_; }
+                                   << buf_<<std::endl; }
 
         const std::string& buf()const {return buf_;}
 

@@ -1,7 +1,4 @@
-
-
 <!--这是注释的写法-->
-
 
 <!DOCTYPE html> <!--DOCTYPE 表示我们使用的规范， 我们默认的是html5，所以说这句现在不写效果一样-->
 
@@ -16,6 +13,11 @@
     <meta name="description" content="这是我第一个网页">
 
     <!--网页的标题-->
+    <style> 
+        .wordBorder{text-align: center;}
+        
+    </style>
+
     <TITLE>"我的第一个网页"</TITLE>
 </head> 
 
@@ -24,14 +26,18 @@
 
     <a name="top">这里</a>
 
-<form action="/1" method="post">
+<form action="/sign" method="post">
 
     <p>名字:<input type="text" name="username"></p>
     <p>密码:<input type="password" name="pwd"></p>
 
     <p><input type="submit" name="submit" value="登录"></p>
-    <p><input type="submit" name="zhuce"  value="注册"></p>
     
+</form>
+
+<form action="submit"  method="post">
+    <p><input type="submit" name="zhuce"  value="注册"></p>
+
 </form>
 
 </body>
