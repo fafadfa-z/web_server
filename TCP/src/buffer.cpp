@@ -82,7 +82,7 @@ void Buffer::clear()
 
 void Buffer::clear(char *index)
 {    
-    if (index == readBuf_ + readIndex2_) //È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    if (index == readBuf_ + readIndex2_) //È«²¿Çå¿Õ
     {
         readIndex1_ = 0;
         readIndex2_ = 0;
@@ -90,7 +90,7 @@ void Buffer::clear(char *index)
     else 
     {
         readIndex1_=std::distance(readBuf_,index);
-        LOG_DEBUG << "Ò»ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½" << Log::end;
+        LOG_DEBUG << "¶Á³öÊý¾Ý,µ«²¢Ã»ÓÐÇå¿Õ " << Log::end;
     }
 }
 
@@ -112,7 +112,7 @@ bool Buffer::sendSendable(int fd)
     }
     else
     {
-        LOG_DEBUG << "Bufferï¼šéœ€è¦äºŒæ¬¡å‘ï¿½???" << Log::end;
+        LOG_DEBUG << "Bufferï¼šéœ€è¦äºŒæ¬¡å‘ï¿????" << Log::end;
         sendIndex1_ += n;
         return false;
     }
@@ -145,9 +145,6 @@ void Buffer::sendMessage(std::string &&mes) //ç¼“å­˜ç­‰å¾…å‘é€çš„æ•°æ®
 
         sendBuf_ = temp;
     }
-    else
-    {
         std::copy(mes.begin(), mes.end(), sendBuf_ + sendIndex2_);
         sendIndex2_ += n;
-    }
 }

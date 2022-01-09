@@ -16,7 +16,7 @@ namespace Http
         resource_ = resource;
     }
 
-    bool HttpDeal::dealQuest() //���������������
+    bool HttpDeal::dealQuest() //���������������?
     {
         auto& fileName = quest_.query();
 
@@ -31,11 +31,6 @@ namespace Http
         case Post:
 
             readEntity(); //处理实体部分
-            // for (auto &[a, b] : entityMap_)
-            // {
-            //     std::cout << std::endl
-            //               << a << "   " << b << std::endl;
-            // }
 
             if (entityMap_.find("submit") != entityMap_.end()) //登录
             {
@@ -43,23 +38,30 @@ namespace Http
 
                 auto mes = sql.searchPlayer(entityMap_["username"]);
 
+                if(mes.id_==0) //找不到文件
+                {
+                    sendFile("/failed.html");
+                    return false;
+                }
+
                 assert(mes.name_ == entityMap_["username"]);
 
-                std::string pass="";
+                std::string pass=entityMap_["pwd"];
+                
                 if(mes.password_==pass) //登录成功
                 {
-                    sendFile("success");
+                    sendFile("/success.html");
                 }
                 else
                 {
-                    sendFile("failed");
+                    sendFile("/failed.html");
                 }
 
             }
-            else if (entityMap_.find("zhuce") != entityMap_.end()) //注册。
+            else if (entityMap_.find("zhuce") != entityMap_.end()) //注册�?
             {
-                LOG_HTTP << "新的注册用户!" << Log::end;
-                sendFile(fileName);
+                LOG_HTTP << "新用户注册!" << Log::end;
+                sendFile("/submit.html");
 
             }
             else
@@ -67,7 +69,7 @@ namespace Http
                 LOG_HTTP << "excepted..." << Log::end;
             }
 
-            return true;
+            return false;
 
         default:
             sendBadMessage();
@@ -77,7 +79,10 @@ namespace Http
     }
     void HttpDeal::sendFile(const std::string&name  )
     {
-        auto file = resource_->findHtml(name);
+        std::shared_ptr<const HtmlFile> file;
+        if(name=="/")   file=resource_->findHtml("/hellow.html");
+        else            file=resource_->findHtml(name);
+        
         if(!file)
         {
             LOG_FATAL<<"No file to send!"<<Log::end;
@@ -114,7 +119,7 @@ namespace Http
 
                 entityMap_.insert({std::string(left, equal), std::string(equal + 1, temp)});
 
-                //std::cout<<"Insert: "<<std::string(left, equal)<<"    "<<std::string(equal + 1, temp)<<std::endl;
+                std::cout<<"Insert: "<<std::string(left, equal)<<" = "<<std::string(equal + 1, temp)<<std::endl;
 
                 left = temp + 1;
             }
@@ -125,7 +130,7 @@ namespace Http
         assert(equal != right);
 
         entityMap_.insert({std::string(left, equal), std::string(equal + 1, right)});
-        //std::cout<<"Insert: "<<std::string(left, equal)<<"    "<<std::string(equal + 1, right)<<std::endl;
+        std::cout<<"Insert: "<<std::string(left, equal)<<" = "<<std::string(equal + 1, right)<<std::endl;
     }
 
     void HttpDeal::sendBadMessage()

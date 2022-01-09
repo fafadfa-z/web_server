@@ -53,16 +53,6 @@ public:
     int getBuf(char*&,int);
     void freeBuf(char*, int);
 
-    int changeBuf(char*&buf,int oldSize,int newSize)
-    {
-        char* temp;
-        auto realSize=getBuf(temp,newSize);
-
-        std::copy(buf,buf+oldSize,temp);
-
-        freeBuf(buf,oldSize);
-        return realSize;
-    }
     private:
     ThreadBufMes localBuf_;
 };

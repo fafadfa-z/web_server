@@ -46,8 +46,6 @@ namespace Http
 
             insertToMap(file, dp->d_name);
 
-
-
             num_++;
 
             LOG_HTTP << "Find resource: " << dir << Log::end;
@@ -61,16 +59,9 @@ namespace Http
     {
         auto size = ::strlen(path);
 
-        std::string ans(size - 5, '\0');
+        std::string ans="/";
+        ans+=path;
 
-        for (int i = 0; i < size - 5; i++)
-        {
-            if (path[i] == '_')
-                ans[i] = '/';
-
-            else
-                ans[i] = path[i];
-        }
         files_[ans] = std::shared_ptr<HtmlFile>(file);
 
         std::cout<<std::endl<<"insert file: "<<ans<<std::endl;

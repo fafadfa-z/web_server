@@ -48,7 +48,7 @@ int BufferPool::getBuf(char *&buf, int size)
 {
     int ans;
 
-    if (size <= buf2kNum)
+    if (size <= 2048)
     {
         if (localBuf_.st2k_.empty())
         {
@@ -62,7 +62,7 @@ int BufferPool::getBuf(char *&buf, int size)
         localBuf_.st2k_.pop();
         localBuf_.used2k_++;
     }
-    else if (size <= buf4kNum)
+    else if (size <= 4096)
     {
         if (localBuf_.st4k_.empty())
         {
@@ -75,7 +75,7 @@ int BufferPool::getBuf(char *&buf, int size)
         localBuf_.st4k_.pop();
         localBuf_.used4k_++;
     }
-    else if (size <= buf8kNum)
+    else if (size <= 8192)
     {
         if (localBuf_.st8k_.empty())
         {
@@ -88,7 +88,7 @@ int BufferPool::getBuf(char *&buf, int size)
         localBuf_.st8k_.pop();
         localBuf_.used8k_++;
     }
-    else if (size <= buf16kNum)
+    else if (size <= 16384)
     {
         if (localBuf_.st16k_.empty())
         {
@@ -112,25 +112,25 @@ void BufferPool::freeBuf(char *buf, int size)
 
     LOG_INFO<<"free buffer size: "<<size<<"index: "<<buf<<Log::end;
 
-    if (size <= buf2kNum)
+    if (size <= 2048)
     {
         localBuf_.st2k_.push(buf);
 
         localBuf_.used2k_--;
     }
-    else if (size <= buf4kNum)
+    else if (size <= 4096)
     {
         localBuf_.st4k_.push(buf);
 
         localBuf_.used4k_--;
     }
-    else if (size <= buf8kNum)
+    else if (size <= 8192)
     {
         localBuf_.st8k_.push(buf);
 
         localBuf_.used8k_--;
     }
-    else if (size <= buf16kNum)
+    else if (size <= 16384)
     {
         localBuf_.st16k_.push(buf);
 
