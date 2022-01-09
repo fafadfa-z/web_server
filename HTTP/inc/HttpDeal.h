@@ -24,7 +24,6 @@ namespace Http
         static void setResource(WebResources*);
 
     private:
-        
         void sendBadMessage();
 
         void readEntity(); //读取HTTP报文的实体信息
@@ -32,7 +31,6 @@ namespace Http
         void sendFile(const std::string&);  //发送w
 
     private:
-
         std::map<std::string,std::string> entityMap_;
 
         HttpRequest&   quest_;

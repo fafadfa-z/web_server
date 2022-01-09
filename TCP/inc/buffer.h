@@ -24,10 +24,10 @@ public:
 
     bool saveReadable(int fd);
 
-    void clear(char* index);  //½«Ç°ÃæµÄÊı¾İÒÆ³öbuffer
-    void clear();             //½«ËùÓĞÊı¾İÒÆ³ı
+    void clear(char* index);  //ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ³ï¿½buffer
+    void clear();             //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ³ï¿½
 
-    void sendMessage(std::string&&mes);
+    void sendMessage(const std::string& mes);
 
     bool sendSendable(int fd);
 
@@ -59,6 +59,8 @@ private:
     static const int initSize_ = 2048;
 
     static thread_local  std::shared_ptr<BufferPool>  pool_;
+
+    static const int maxSendSize_=16384; //å•æ¬¡å‘é€çš„æœ€å¤§é™åˆ¶ã€‚
 };
 
 

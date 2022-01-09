@@ -21,7 +21,6 @@ using std::string;
 
 std::shared_ptr<TCPServer> server;
 
-
 int main()
 {
     std::cout << "hellow! " << std::endl;
@@ -31,13 +30,7 @@ int main()
     auto httpSever=Http::HttpServer::init();
 
     httpSever->beginServer();
-     
-    // MySql_::SqlMess conn;
-
-    //auto ret=conn.searchByName("???1");
-
-    // auto ret=conn.insert("wulan","wulan",Time::getNowTime());
-
+    
 
     while(1)
     {   

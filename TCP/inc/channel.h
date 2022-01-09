@@ -34,7 +34,7 @@ public:
 
     void  readAll(std::vector<char>&);
 
-    void send(std::string& message);
+    void send(const std::string& message);
 
     void dealEvent(epoll_event& event);  //事件提取
 

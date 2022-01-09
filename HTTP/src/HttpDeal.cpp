@@ -56,7 +56,6 @@ namespace Http
                 {
                     sendFile("/failed.html");
                 }
-
             }
             else if (entityMap_.find("zhuce") != entityMap_.end()) //注册�?
             {
@@ -85,7 +84,7 @@ namespace Http
         
         if(!file)
         {
-            LOG_FATAL<<"No file to send!"<<Log::end;
+            LOG_FATAL<<"远程用户请求了不存在的数据"<<Log::end;
             sendBadMessage();
             return;
         }
@@ -95,11 +94,12 @@ namespace Http
         
         message.fillRequestMessage(file->size());
 
-        mes = message.dealMessage("ok", file->buf());
+        mes = message.dealMessage("ok");
 
         LOG_HTTP << "send size:" << mes.size() << Log::end;
 
         conn_.send(mes);
+        conn_.send(file->buf());
     }
 
     void HttpDeal::readEntity()
@@ -137,7 +137,7 @@ namespace Http
     {
         HttpMessage message(Http404);
         message.addHeader("Server", "fafadfa");
-        auto mes = message.dealMessage("not found", "");
+        auto mes = message.dealMessage("not found");
         conn_.send(mes);
         LOG_HTTP << "error: cannot find request files: " << quest_.query() << Log::end;
     }

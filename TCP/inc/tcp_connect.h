@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <functional>
+#include <filesystem>
 #include <string>
 #include "buffer.h"
 #include "channel.h"
@@ -18,7 +19,9 @@ public:
         buffer_->clear(index);
     }
 
-    void send(std::string &message) { channel_->send(message); }
+    void send(const std::string &message) { channel_->send(message);}
+
+    void sendBigMes(std::filesystem::path);   //ç›´æŽ¥å‘é€ä¸€ä¸ªæ–‡ä»¶
 
     auto buffer() const
     {
@@ -30,12 +33,12 @@ public:
 
     void send(const char *message)
     {
-        std::string temp(message);
+        const std::string temp(message);
 
         send(temp);
     }
 
-    void clearBuf() { buffer_->clear(); } //ÉáÆúËùÓÐÊý¾Ý
+    void clearBuf() { buffer_->clear(); } //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     auto fd() const { return channel_->fd(); }
 

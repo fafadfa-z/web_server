@@ -96,9 +96,9 @@ void Channel::close()
 }
 
 
-void Channel::send(std::string &message)   //
+void Channel::send(const std::string &message)   //
 {
-    buf_->sendMessage(std::move(message));
+    buf_->sendMessage(message);
 
     enableWrite();
 }

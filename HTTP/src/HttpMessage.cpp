@@ -6,11 +6,11 @@
 namespace Http
 {
 
-    std::string HttpMessage::dealMessage(const std::string& mes,const std::string& message)
+    std::string HttpMessage::dealMessage(const std::string& mes)
     {
         std::string ans;
 
-        ans.reserve(mes.size()+message.size()+25);
+        ans.reserve(mes.size()+25);
 
         if (version_ == Http11)
             ans += "HTTP/1.1 ";
@@ -29,11 +29,6 @@ namespace Http
 
         ans += _r_n;
 
-        if (!message.empty())
-        {
-            ans += message;
-            ans += _r_n;
-        }
         return ans;
     }
 

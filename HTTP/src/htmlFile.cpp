@@ -1,14 +1,9 @@
-#include <sys/stat.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <assert.h>
-
 #include "htmlFile.h"
+
+namespace fs = std::filesystem;
 
 namespace Http
 {
-
     WebResources::WebResources(const std::string &resoutcePath)
         : num_(0)
     {
@@ -19,59 +14,37 @@ namespace Http
 
     void WebResources::findFile(const std::string &path)
     {
-        struct stat st;
-        auto res1 = ::stat(path.c_str(), &st); //检测路径是否合法
+        fs::path filePath(path);
 
-        assert(res1 >= 0);
+        fs::directory_entry direEntry(filePath);
 
-        auto res2 = S_ISDIR(st.st_mode); //检测路径是否是目录
+        assert(direEntry.is_directory());
 
-        assert(res2 == true);
-
-        auto dir = ::opendir(path.c_str());
-
-        struct dirent *dp = NULL;
-
-        while ((dp = ::readdir(dir)) != nullptr)
+        for (auto file : fs::recursive_directory_iterator(direEntry))
         {
-            if ((!strncmp(dp->d_name, ".", 1)) || (!strncmp(dp->d_name, "..", 2))) //忽略这两个目录
+            if (!file.is_regular_file())
                 continue;
 
-            std::string dir(path);
+            if (fs::file_size(file) < 16384)  // 对于16k以下的小文件，直接读到内存里。
+            {
+                HtmlFile *htmlFile = new HtmlFile(file.path().string());
+                num_++;
+                std::string fullName = std::string("/") + file.path().filename().c_str();
 
-            dir += '/';
-            dir += dp->d_name;
+                files_[fullName] = std::shared_ptr<HtmlFile>(htmlFile);
+            }
+            else 
+            {
 
-            HtmlFile *file = new HtmlFile(dir);
 
-            insertToMap(file, dp->d_name);
-
-            num_++;
-
-            LOG_HTTP << "Find resource: " << dir << Log::end;
-
-            //file->display();
+            }
         }
-        ::closedir(dir);
-    }
-
-    void WebResources::insertToMap(HtmlFile *file, const char *path)
-    {
-        auto size = ::strlen(path);
-
-        std::string ans="/";
-        ans+=path;
-
-        files_[ans] = std::shared_ptr<HtmlFile>(file);
-
-        std::cout<<std::endl<<"insert file: "<<ans<<std::endl;
     }
 
     std::shared_ptr<const HtmlFile> WebResources::findHtml(const std::string &name) const
     {
         auto iter = files_.find(name);
 
-        
         if (iter == files_.end())
             return std::shared_ptr<const HtmlFile>(nullptr);
 

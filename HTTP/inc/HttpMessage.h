@@ -35,7 +35,7 @@ namespace Http
 
         void setMessageMode(HttpReplyMode mod) { mod_ = mod; }
 
-        std::string dealMessage(const std::string &mes, const std::string &message);
+        std::string dealMessage(const std::string &mese);
 
         void fillRequestMessage(size_t size)
         {

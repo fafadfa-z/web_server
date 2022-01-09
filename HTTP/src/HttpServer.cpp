@@ -83,36 +83,36 @@ namespace Http
     {
         LOG_HTTP << "Begin dealMessage..." << Log::end;
 
-        auto [left,right]=conn->buffer();
-        std::string temp(left,right);
+        // auto [left,right]=conn->buffer();
+        // std::string temp(left,right);
 
-        std::cout<<std::endl<<"receive size: "<<temp.size()<<std::endl;
-        std::cout<<temp;
+        // std::cout<<std::endl<<"receive size: "<<temp.size()<<std::endl;
+        // std::cout<<temp;
 
-        auto [status, index] = quest_.readMessage(conn);  //读数据
+        auto [status, index] = quest_.readMessage(conn);  //识别消息格式
 
-        if(status==CanDeal)  //数据已经接收完成
+        if(status==CanDeal)  //处理请求
         {
             conn->read(index);
 
             HttpDeal deal(quest_, *conn);
 
-            deal.dealQuest(); //处理消息
+            deal.dealQuest(); //处理请求
             quest_.clear();
 
         }
-        else if(status==MoreMes)  //数据没有处理完
+        else if(status==MoreMes)  //消息还没有发完
         {
             conn->read(index);
         }
-        else if(status==badMes)   //锟斤拷式锟斤拷锟斤拷
+        else if(status==badMes)   //不能识别的格式
         {
             quest_.clear();
             conn->read(index);
             conn->send("HTTP/1.1 400 BadRequest\r\n\r\n");
 
         }
-        else  LOG_FATAL << "锟斤拷锟斤拷锟阶刺?锟斤拷锟斤拷锟斤拷" << Log::end;
+        else  LOG_FATAL << "意外的状态" << Log::end;
 
     }
 

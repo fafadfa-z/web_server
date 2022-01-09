@@ -3,6 +3,7 @@
 
 #include <string>
 #include <fstream>
+#include <filesystem>
 
 namespace Base
 {
@@ -12,7 +13,12 @@ class FileRead
 public:
     FileRead(const std::string& path);
 
+    FileRead(const std::filesystem::path& path)
+        :FileRead(path.string()){}
+
     void read(std::string& buf);
+
+    int  read(std::string& buf,int index,int maxSize=16*1024);
 
     ~FileRead();
 

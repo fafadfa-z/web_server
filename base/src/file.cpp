@@ -11,6 +11,7 @@ namespace Base
         isOpen_ = file_.is_open();
     }
 
+
     void FileRead::read(std::string& buf)
     {
         if(!isOpen_) return;
@@ -21,6 +22,12 @@ namespace Base
        buf.assign(iter,eof);   //这玩意能读完吗。。。
 
        closeFile();
+    }
+    int FileRead::read(std::string& buf,int index,int maxSize)
+    {
+
+
+        return 0;
     }
 
     FileRead::~FileRead()
