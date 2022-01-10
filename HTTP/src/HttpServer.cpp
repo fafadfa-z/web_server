@@ -10,6 +10,8 @@ class TCPConnection;
 
 namespace Http
 {
+    thread_local  std::map<int,std::unique_ptr<HttpRequest>> HttpServer::questMap_;
+
     const std::string HttpServer::sourcePath_ =
         "/home/fafadfa/project/webserver/web_server/HtmlFiles";
 
@@ -78,42 +80,67 @@ namespace Http
     {
         tcpServer_->beginServer();
     }
+    
+    bool  HttpServer::handleMes(TCPConnection* conn,HttpRequest&quest)
+    {
+        auto [status, index] = quest.readMessage(conn);  //è¯»å–ä¿¡æ¯
 
+        if(status==CanDeal)  //æ•°æ®å¯ä»¥å¤„ç†
+        {
+            conn->read(index);
+
+            HttpDeal deal(quest, *conn);
+
+            deal.dealQuest(); //
+            return true;
+        }
+        else if(status==MoreMes)  //æ•°æ®æ²¡æœ‰å®Œæ•´æŽ¥æ”¶ï¼Œç­‰å¾…æŽ¥æ”¶ã€‚
+        {
+            conn->read(index);
+            return false;
+        }
+        else if(status==badMes)   //æ— æ³•è¯†åˆ«çš„æ•°æ®
+        {
+            conn->read(index);
+            conn->send("HTTP/1.1 400 BadRequest\r\n\r\n");
+            return true;
+        }
+        else  LOG_FATAL << "æ„å¤–çš„çŠ¶æ€.." << Log::end;
+
+        return true;
+    }
     void HttpServer::dealMessage(TCPConnection *conn)
     {
         LOG_HTTP << "Begin dealMessage..." << Log::end;
 
-        // auto [left,right]=conn->buffer();
-        // std::string temp(left,right);
+        auto [left,right]=conn->buffer();
+        std::string temp(left,right);
 
-        // std::cout<<std::endl<<"receive size: "<<temp.size()<<std::endl;
-        // std::cout<<temp;
+        std::cout<<std::endl<<"receive size: "<<temp.size()<<std::endl;
+        std::cout<<temp;
 
-        auto [status, index] = quest_.readMessage(conn);  //Ê¶±ðÏûÏ¢¸ñÊ½
+        auto itor=questMap_.find(conn->fd());
 
-        if(status==CanDeal)  //´¦ÀíÇëÇó
+        if(itor==questMap_.end()) //å¦‚æžœè¿™ä¸ªè¯·æ±‚æ˜¯ç¬¬ä¸€æ¬¡å¤„ç†
         {
-            conn->read(index);
+            LOG_INFO<<"New  player!"<<Log::end;
 
-            HttpDeal deal(quest_, *conn);
+            std::unique_ptr<HttpRequest> quest=std::make_unique<HttpRequest>();
 
-            deal.dealQuest(); //´¦ÀíÇëÇó
-            quest_.clear();
-
+            auto ret=handleMes(conn,*quest);
+            
+            if(ret==false) questMap_.insert({conn->fd(),std::move(quest)});
         }
-        else if(status==MoreMes)  //ÏûÏ¢»¹Ã»ÓÐ·¢Íê
+        else
         {
-            conn->read(index);
-        }
-        else if(status==badMes)   //²»ÄÜÊ¶±ðµÄ¸ñÊ½
-        {
-            quest_.clear();
-            conn->read(index);
-            conn->send("HTTP/1.1 400 BadRequest\r\n\r\n");
+            LOG_DEBUG<<"Old player..."<<Log::end;
 
-        }
-        else  LOG_FATAL << "ÒâÍâµÄ×´Ì¬" << Log::end;
+            auto& [fd,quest] =*itor;
 
+            auto ret=handleMes(conn,*quest);
+
+            if(ret==true) questMap_.erase(itor); 
+        }
     }
 
     void HttpServer::connectClose(TCPConnection *conn)

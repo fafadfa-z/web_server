@@ -5,6 +5,7 @@
 namespace Base
 {
     FileRead::FileRead(const std::string& path)
+        :path_(path)
     {
         file_.open(path, std::ios::in);
 
@@ -25,8 +26,6 @@ namespace Base
     }
     int FileRead::read(std::string& buf,int index,int maxSize)
     {
-
-
         return 0;
     }
 

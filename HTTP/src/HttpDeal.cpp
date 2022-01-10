@@ -61,7 +61,6 @@ namespace Http
             {
                 LOG_HTTP << "新用户注册!" << Log::end;
                 sendFile("/submit.html");
-
             }
             else
             {
@@ -98,8 +97,7 @@ namespace Http
 
         LOG_HTTP << "send size:" << mes.size() << Log::end;
 
-        conn_.send(mes);
-        conn_.send(file->buf());
+        conn_.sendWithFile(mes,file->buf());
     }
 
     void HttpDeal::readEntity()

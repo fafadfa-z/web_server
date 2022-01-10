@@ -4,8 +4,10 @@
 #include "server.h"
 
 #include <chrono>
-
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <sys/sendfile.h>
 
 thread_local std::shared_ptr<PoolProcess> Channel::poolPro_(nullptr);
 TCPServer* Channel::server_=nullptr;
@@ -29,11 +31,14 @@ void Channel::dealEvent(epoll_event &event)
 
         auto flag=buf_->sendSendable(fd_);
 
-        if(flag) disableWrite();
+        if(flag) 
+        {
+            if(path_) sendFile();
+            disableWrite();
+        }
 
-         isDeal = true;
+        isDeal = true;
     }
-
     if ((event.events & POLLIN) || !buf_->empty()) //这个不能放在第一个，如果放在第一个则可能在写操作执行之前关闭端口
     {
         if (fd_==poolPro_->weakUpFd()) // weakup 情况
@@ -73,7 +78,11 @@ void Channel::dealEvent(epoll_event &event)
 void Channel::enableWrite()
 {
     LOG_INFO << "channel: " << fd_ << "  enable write..." << Log::end;
-    assert(!(events_ & POLLOUT));
+    
+    if(events_ & POLLOUT) //如果之前已经打开了发送
+    {  
+        return;
+    }
 
     events_ |= POLLOUT;
 
@@ -90,17 +99,30 @@ void Channel::disableWrite()
     poolPro_->changeEvent(events_, fd_);
 }
 
+void Channel::sendFile()
+{
+    auto fileFd=::open(path_->c_str(),O_RDONLY);
+
+    if(fileFd<=0) return;
+
+    struct stat fileStat;
+
+    ::fstat(fileFd,&fileStat);
+
+    fileSize_=fileStat.st_size;
+
+    std::cout<<std::endl<<"需要发送: "<<fileSize_<<std::endl;
+    
+    auto fileIndex_=::sendfile(fd_,fileFd,nullptr,fileSize_);
+
+    std::cout<<"实际发送了: "<<fileIndex_<<std::endl;  
+
+    assert(fileIndex_==fileSize_);
+}
+
 void Channel::close()
 {
     poolPro_->removeFd(fd_);
-}
-
-
-void Channel::send(const std::string &message)   //
-{
-    buf_->sendMessage(message);
-
-    enableWrite();
 }
 
 Channel::~Channel()

@@ -5,74 +5,89 @@
 #include <string>
 #include <functional>
 #include <mutex>
+#include <vector>
+#include <optional>
+#include <filesystem>
 
 #include <sys/epoll.h>
 #include <sys/poll.h>
 #include <assert.h>
-#include <vector>
 
+
+#include "buffer.h"
 #include "timePoint.h"
 
 class PoolProcess;
 class TCPServer;
-class Buffer;
 
-class Channel: public std::enable_shared_from_this<Channel>
+
+class Channel : public std::enable_shared_from_this<Channel>
 {
-    using CallBackFunction=std::function<void()>;
+    using CallBackFunction = std::function<void()>;
 
 public:
-    Channel(int fd,std::shared_ptr<Buffer>buf=nullptr)
-        :fd_(fd),
-        events_(EPOLLIN|EPOLLPRI),
-        buf_(buf),
-        timeCost_("channel: ")
+    Channel(int fd, std::shared_ptr<Buffer> buf = nullptr)
+        : fd_(fd),
+          events_(EPOLLIN | EPOLLPRI),
+          buf_(buf),
+          timeCost_("channel: "),
+          path_(std::nullopt),
+          fileSize_(0),
+          fileIndex_(0)
+
     {
     }
 
     ~Channel();
 
-    void  readAll(std::vector<char>&);
+    void readAll(std::vector<char> &);
 
-    void send(const std::string& message);
+    void send(const std::string &message)
+    {
+        buf_->sendMessage(message);
 
-    void dealEvent(epoll_event& event);  //事件提取
+        enableWrite();
+    }
 
-    const int events()const{return events_;}
+    void sendWithFile(const std::string &message, const std::filesystem::path &path)
+    {
+        send(message);
+        path_=path;
+    }
+
+    void dealEvent(epoll_event &event); //事件提取
+
+    const int events() const { return events_; }
 
     void enableWrite();
 
-    
+    Buffer *buf() { return buf_.get(); };
 
-    
+    static void setPoolPro(std::shared_ptr<PoolProcess> pro);
+    static void setServer(TCPServer *server);
 
-    Buffer* buf() {return buf_.get();};
-
-    static void setPoolPro(std::shared_ptr<PoolProcess>pro);
-    static void setServer(TCPServer*  server);
-
-    int fd()const {return fd_;}
+    int fd() const { return fd_; }
 
 private:
-    
     void disableWrite();
-    
+    void sendFile();
+
     void close();
 
     int fd_;
     int events_;
+    uint64_t fileSize_;
+    uint64_t fileIndex_;
 
-    Time::TimeRecord timeCost_;// 记录占用时间
+    std::optional<std::filesystem::path> path_;
+    
+    Time::TimeRecord timeCost_; // 记录占用时间
 
-    std::shared_ptr<Buffer>buf_;
+    std::shared_ptr<Buffer> buf_;
 
 private:
-
     static thread_local std::shared_ptr<PoolProcess> poolPro_;
-    static TCPServer* server_;
+    static TCPServer *server_;
 };
-
-
-
 
 #endif

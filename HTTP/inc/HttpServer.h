@@ -15,6 +15,7 @@ namespace Http
 {
     class HttpServer
     {
+        using mapType= std::map<int,std::unique_ptr<HttpRequest>>;
     public:
 
         static HttpServer *init();
@@ -31,10 +32,9 @@ namespace Http
         char *findRequest(char *start, char *end);
         void connectClose(TCPConnection* conn);
 
-    private:
-        
-        HttpRequest quest_;
+        bool  handleMes(TCPConnection* conn,HttpRequest&);
 
+    private:
         long connCount;  // 记录当前的连接数
  
         WebResources WebResources_;
@@ -44,7 +44,7 @@ namespace Http
         static HttpServer *entity;
 
         static const std::string sourcePath_;
+        static thread_local mapType questMap_;
     };
-
 }
 #endif

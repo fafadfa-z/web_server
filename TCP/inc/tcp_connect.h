@@ -21,7 +21,8 @@ public:
 
     void send(const std::string &message) { channel_->send(message);}
 
-    void sendBigMes(std::filesystem::path);   //直接发送一个文件
+    void sendWithFile(const std::string &message,const std::filesystem::path& path)   //发送一个文件
+    { channel_->sendWithFile(message,path); }
 
     auto buffer() const
     {

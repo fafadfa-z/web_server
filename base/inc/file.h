@@ -24,6 +24,8 @@ public:
 
     bool  isOpen()const {return isOpen_;}
 
+    const std::filesystem::path& path()const {return  path_;}
+
 protected:
     void closeFile();
 
@@ -31,6 +33,8 @@ private:
     bool isOpen_;
 
     std::ifstream file_;
+
+    std::filesystem::path path_;
 };
 
 }

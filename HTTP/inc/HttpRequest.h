@@ -26,9 +26,9 @@ namespace Http
 
     enum MesState
     {
-        CanDeal,    //Õı³££¬À´ÁËÒ»¸öÏûÏ¢
-        MoreMes,    //Õı³££¬ºóÃæ»¹ÓĞÏûÏ¢
-        badMes     //´íÎó£¬ÎŞ·¨½âÎöµÄÏûÏ¢
+        CanDeal,    //æœ¬æ¡æ¶ˆæ¯å·²ç»è¯»å–æˆåŠŸ
+        MoreMes,    //æœ¬æ¡æ¶ˆæ¯è¿˜æ²¡æœ‰è¯»å®Œ
+        badMes      //æ— æ³•ç†è§£çš„æ¶ˆæ¯
 
     };
 
@@ -76,17 +76,17 @@ namespace Http
     private:
 
 
-        std::map<std::string, std::string> headerMap_; //ÇëÇóĞĞ
+        std::map<std::string, std::string> headerMap_; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
         std::string query_;  //URL
         
-        std::string entity_; //ÊµÌå²¿·Ö
+        std::string entity_; //Êµï¿½å²¿ï¿½ï¿½
 
         HttpMode request_;
 
         HttpVersion version_;
 
-        static const size_t maxRequestSize=2048; //ÇëÇóĞĞµÄ×î´ó³¤¶È
+        static const size_t maxRequestSize=2048; //ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½ï¿½ï¿½ó³¤¶ï¿½
 
         State state_;
 
