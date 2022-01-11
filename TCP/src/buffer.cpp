@@ -96,7 +96,7 @@ void Buffer::clear(char *index)
 
 bool Buffer::sendSendable(int fd)
 {
-    assert(sendIndex2_ != sendIndex1_);
+    if(sendIndex2_ == sendIndex1_) return true;
 
     int size = sendIndex2_ - sendIndex1_;
 

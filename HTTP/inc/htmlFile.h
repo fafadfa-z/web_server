@@ -17,24 +17,13 @@ namespace Http
         HtmlFile(const std::string &path)
             : Base::FileRead(path)
         {
-            // if (isOpen())
-            // {
-            //     Base::FileRead::read(buf_);
 
-            //     LOG_HTTP << "Read html file success! read size: " << buf_.size() << "  " << path << Log::end;
-            // }
-            // else
-            //     LOG_HTTP << "Read html file file error... " << path << Log::end;
         }
         ~HtmlFile()
         {
         }
-        void display() { LOG_COUT << "html files:\n"
-                                  << buf_ << std::endl; }
 
-        const std::string &buf() const { return buf_; }
-
-        size_t size() const { return buf_.size(); }
+       
 
     private:
         std::string buf_;

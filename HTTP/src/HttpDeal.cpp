@@ -97,7 +97,7 @@ namespace Http
 
         LOG_HTTP << "send size:" << mes.size() << Log::end;
 
-        conn_.sendWithFile(mes,file->buf());
+        conn_.sendWithFile(mes,file->path());
     }
 
     void HttpDeal::readEntity()

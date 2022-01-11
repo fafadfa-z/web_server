@@ -9,6 +9,8 @@ namespace Base
     {
         file_.open(path, std::ios::in);
 
+        size_=std::filesystem::directory_entry(path_).file_size();
+
         isOpen_ = file_.is_open();
     }
 

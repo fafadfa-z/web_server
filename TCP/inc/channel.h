@@ -33,7 +33,8 @@ public:
           timeCost_("channel: "),
           path_(std::nullopt),
           fileSize_(0),
-          fileIndex_(0)
+          fileIndex_(0),
+          fileFd_(0)
 
     {
     }
@@ -49,11 +50,7 @@ public:
         enableWrite();
     }
 
-    void sendWithFile(const std::string &message, const std::filesystem::path &path)
-    {
-        send(message);
-        path_=path;
-    }
+    void sendWithFile(const std::string &, const std::filesystem::path &);
 
     void dealEvent(epoll_event &event); //事件提取
 
@@ -70,14 +67,16 @@ public:
 
 private:
     void disableWrite();
-    void sendFile();
+    bool sendFile();
 
     void close();
 
     int fd_;
     int events_;
+
+    int fileFd_;
     uint64_t fileSize_;
-    uint64_t fileIndex_;
+    off_t fileIndex_;
 
     std::optional<std::filesystem::path> path_;
     

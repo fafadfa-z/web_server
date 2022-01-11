@@ -23,6 +23,7 @@ public:
     ~FileRead();
 
     bool  isOpen()const {return isOpen_;}
+    uint64_t size() const { return size_; }
 
     const std::filesystem::path& path()const {return  path_;}
 
@@ -30,6 +31,8 @@ protected:
     void closeFile();
 
 private:
+
+    uint64_t size_;
     bool isOpen_;
 
     std::ifstream file_;

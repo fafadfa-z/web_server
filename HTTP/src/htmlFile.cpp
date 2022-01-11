@@ -25,19 +25,11 @@ namespace Http
             if (!file.is_regular_file())
                 continue;
 
-            if (fs::file_size(file) < 16384)  // 对于16k以下的小文件，直接读到内存里。
-            {
-                HtmlFile *htmlFile = new HtmlFile(file.path().string());
-                num_++;
-                std::string fullName = std::string("/") + file.path().filename().c_str();
+            HtmlFile *htmlFile = new HtmlFile(file.path().string());
+            num_++;
+            std::string fullName = std::string("/") + file.path().filename().c_str();
 
-                files_[fullName] = std::shared_ptr<HtmlFile>(htmlFile);
-            }
-            else 
-            {
-
-
-            }
+            files_[fullName] = std::shared_ptr<HtmlFile>(htmlFile);
         }
     }
 

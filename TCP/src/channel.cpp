@@ -33,8 +33,11 @@ void Channel::dealEvent(epoll_event &event)
 
         if(flag) 
         {
-            if(path_) sendFile();
-            disableWrite();
+            bool ret=false;
+
+            if(path_) ret=sendFile();
+            
+            if(ret==false) disableWrite();
         }
 
         isDeal = true;
@@ -98,26 +101,40 @@ void Channel::disableWrite()
 
     poolPro_->changeEvent(events_, fd_);
 }
+void Channel::sendWithFile(const std::string &message, const std::filesystem::path &path)
+    {
+        send(message);
+        path_=path;
 
-void Channel::sendFile()
+        fileFd_=::open(path_->c_str(),O_RDONLY);
+
+        assert(fileFd_>0);
+        struct stat fileStat;
+
+        ::fstat(fileFd_,&fileStat);
+
+        fileSize_=fileStat.st_size;
+        fileIndex_=0;
+
+    }
+
+bool  Channel::sendFile()
 {
-    auto fileFd=::open(path_->c_str(),O_RDONLY);
+    std::cout<<std::endl<<"发送文件: "<<path_->c_str()<<std::endl;
 
-    if(fileFd<=0) return;
-
-    struct stat fileStat;
-
-    ::fstat(fileFd,&fileStat);
-
-    fileSize_=fileStat.st_size;
-
-    std::cout<<std::endl<<"需要发送: "<<fileSize_<<std::endl;
+    std::cout<<"需要发送: "<<fileSize_<<std::endl;
     
-    auto fileIndex_=::sendfile(fd_,fileFd,nullptr,fileSize_);
+    fileIndex_=::sendfile(fd_,fileFd_,&fileIndex_,fileSize_);
 
     std::cout<<"实际发送了: "<<fileIndex_<<std::endl;  
 
-    assert(fileIndex_==fileSize_);
+    if(fileIndex_==fileSize_)
+    {
+        path_=std::nullopt;
+        ::close(fileFd_);
+        return false;
+    }
+    return true; //需要重复发送
 }
 
 void Channel::close()
