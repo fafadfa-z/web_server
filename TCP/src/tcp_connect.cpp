@@ -1,6 +1,6 @@
 #include "tcp_connect.h"
-#include "server.h"
-#include "channel.h"
+#include "tcp_server.h"
+#include "tcp_channel.h"
 #include "logger.h"
 
 

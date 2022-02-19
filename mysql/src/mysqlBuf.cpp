@@ -1,5 +1,6 @@
-#include "mysqlBuf.h"
-#include "timePoint.h"
+#include "mysql_buf.h"
+#include "time_point.h"
+
 namespace MySql_
 {
     MySqlBuf::MySqlBuf()
@@ -12,7 +13,6 @@ namespace MySql_
         auto time=Time::getNowTime();
 
         return conn_->insert(name,password,time);
-
     }
 
     const webMes MySqlBuf::searchPlayer(const std::string& name)

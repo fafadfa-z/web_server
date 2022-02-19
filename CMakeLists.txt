@@ -1,14 +1,14 @@
 
 
 cmake_minimum_required(VERSION 3.2)
-project(template)
+project(fafadfa_template)
 
-include_directories(TCP/inc)
-include_directories(log/inc)
-include_directories(time/inc)
-include_directories(HTTP/inc)
-include_directories(base/inc)
-include_directories(mysql/inc)
+include_directories(TCP/include)
+include_directories(log/include)
+include_directories(time/include)
+include_directories(HTTP/include)
+include_directories(base/include)
+include_directories(mysql/include)
 
 include_directories(mysql-connector/include)
 
@@ -30,7 +30,7 @@ aux_source_directory(./ DIR_SRCS)
 set(TEST_MATH ${DIR_SRCS})   #这句话要是不加，则不会生成src下的目录
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g -L/usr/local/lib64 -lstdc++ -DDEBUG")   #对应g++的输入参数
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g -Wall -DDEBUG")   #对应g++的输入参数
 
 add_executable(out.exe ${TEST_MATH})
 

@@ -3,7 +3,7 @@
 #include <thread>
 #include <chrono>
 
-#include "timePoint.h"
+#include "time_point.h"
 
 namespace Time
 {

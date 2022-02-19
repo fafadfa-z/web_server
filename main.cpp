@@ -1,18 +1,11 @@
 #include <iostream>
-#include <string>
-#include <unistd.h>
-#include <vector>
 
-#include "server.h"
+#include "tcp_server.h"
 #include "logger.h"
-#include "HttpServer.h"
 
-#include "LocalMessage.h"
+#include "http_server.h"
 
-#include "timePoint.h"
 
-#include <fstream>
-using namespace std;
 
 std::shared_ptr<TCPServer> server;
 

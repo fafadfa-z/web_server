@@ -1,4 +1,4 @@
-#include "timePoint.h"
+#include "time_point.h"
 
 
 namespace Time
@@ -31,7 +31,7 @@ namespace Time
 
         char buf[64] = {0};
 
-        snprintf(buf, sizeof(buf), "%02d:%02d:%02d.%06d",
+        snprintf(buf, sizeof(buf), "%02d:%02d:%02d.%06ld",
                  tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec,
                  (count)%1000'000);
 
