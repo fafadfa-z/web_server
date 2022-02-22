@@ -4,7 +4,7 @@
 #include "logger.h"
 #include "http_message.h"
 
-#include "HttpDeal.h"
+#include "http_deal.h"
 
 class TCPConnection;
 
@@ -13,7 +13,7 @@ namespace Http
     thread_local  std::map<int,std::unique_ptr<HttpRequest>> HttpServer::questMap_;
 
     const std::string HttpServer::sourcePath_ =
-        "/home/fafadfa/project/webserver/web_server/HtmlFiles";
+        "/root/web_server/HtmlFiles";
 
     HttpServer *HttpServer::entity = nullptr;
 
@@ -70,8 +70,8 @@ namespace Http
         tcpServer_ = TCPServer::init(address, 1);
 
         tcpServer_->setReadableCallBack(std::bind(&HttpServer::dealMessage, *this, std::placeholders::_1));
-        tcpServer_->setConnectCallBack([this](TCPConnectionPtr conn) -> void
-                                       { dealConnection(conn); });
+        // tcpServer_->setConnectCallBack([this](TCPConnectionPtr conn) -> void
+        //                                { dealConnection(conn); });
 
         HttpDeal::setResource(&WebResources_);
     }
@@ -113,7 +113,7 @@ namespace Http
     {
         LOG_HTTP << "Begin dealMessage..." << Log::end;
 
-        auto [left,right]=conn->buffer();
+        // auto [left,right]=conn->buffer();
         
         // std::string temp(left,right);
 
@@ -130,7 +130,13 @@ namespace Http
 
             auto ret=handleMes(conn,*quest);
             
-            if(ret==false) questMap_.insert({conn->fd(),std::move(quest)});
+            if(ret==false) 
+                questMap_.insert({conn->fd(),std::move(quest)});
+            else 
+            {
+                connCount++;
+                LOG_DEBUG<<"deal message: "<<connCount<<Log::end;
+            }
         }
         else
         {
@@ -140,7 +146,12 @@ namespace Http
 
             auto ret=handleMes(conn,*quest);
 
-            if(ret==true) questMap_.erase(itor); 
+            if(ret==true) 
+            {
+                connCount++;
+                LOG_DEBUG<<"deal message: "<<connCount<<Log::end;
+                questMap_.erase(itor); 
+            }
         }
     }
 
@@ -156,7 +167,6 @@ namespace Http
 
     void HttpServer::dealConnection(TCPConnection *conn)
     {
-        connCount++;
     }
 
 }

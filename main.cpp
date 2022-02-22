@@ -5,8 +5,6 @@
 
 #include "http_server.h"
 
-
-
 std::shared_ptr<TCPServer> server;
 
 int main()

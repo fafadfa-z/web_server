@@ -91,13 +91,14 @@ void Channel::enableWrite()
 
 void Channel::disableWrite()
 {
-    LOG_INFO << "channel: " << fd_ << "  disable write..." << Log::end;
+   // std::cout << "channel: " << fd_ << "  disable write..." << std::endl;
     assert(events_ & POLLOUT);
 
     events_ &= 0b1111'1111'1011;
 
     poolPro_->changeEvent(events_, fd_);
 }
+
 void Channel::sendWithFile(const std::string &message, const std::filesystem::path &path)
     {
         send(message);
@@ -117,13 +118,8 @@ void Channel::sendWithFile(const std::string &message, const std::filesystem::pa
 
 bool  Channel::sendFile()
 {
-    std::cout<<std::endl<<"发送文件: "<<path_->c_str()<<std::endl;
-
-    std::cout<<"需要发送: "<<fileSize_<<std::endl;
-    
+    assert(fileIndex_==0);
     fileIndex_=::sendfile(fd_,fileFd_,&fileIndex_,fileSize_);
-
-    std::cout<<"实际发送了: "<<fileIndex_<<std::endl;  
 
     if(fileIndex_==fileSize_)
     {
@@ -131,6 +127,7 @@ bool  Channel::sendFile()
         ::close(fileFd_);
         return false;
     }
+    //std::cout<<"一次没发完"<<std::endl;
     return true; //需要重复发送
 }
 
@@ -141,5 +138,5 @@ void Channel::close()
 
 Channel::~Channel()
 {
-    LOG_DEBUG << "channel 析构" << fd_ << Log::end;
+    LOG_INFO << "channel 析构" << fd_ << Log::end;
 }

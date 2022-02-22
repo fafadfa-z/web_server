@@ -5,7 +5,7 @@
 namespace Log
 {
 
-    const char *logPath = "/home/fafadfa/log/";
+    const char *logPath = "/root/web_server/log_file/";
 
     const int LogThread::maxBufSize = 1000 * 1024;
     

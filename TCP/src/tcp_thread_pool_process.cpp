@@ -40,6 +40,7 @@ void PoolProcess::operator()()
 
 void PoolProcess::distribute()
 {
+    ::memset(events_,0,sizeof(events_));
     int messageSize = epoll_wait(epollFd_, events_, evenListMax_, timeout_);
 
     if (messageSize > 0)
@@ -85,7 +86,7 @@ void PoolProcess::insertToEpoll(const std::shared_ptr<Channel>& channel)  //这�
 
 void PoolProcess::removeFd(int fd)          //这个函数是事件处理线程调用的�?
 {
-    LOG_DEBUG << "removeFd: " << fd << Log::end;
+    LOG_INFO << "removeFd: " << fd << Log::end;
 
     auto iter = channelMap_.find(fd);
 
@@ -113,7 +114,6 @@ void PoolProcess::changeEvent(int event, int fd)
     LOG_FATAL << "Change event error" << Log::end;
 }
 
-#include <errno.h>
 
 void PoolProcess::weakup(int mes)
 {

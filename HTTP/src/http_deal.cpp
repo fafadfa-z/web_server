@@ -75,6 +75,8 @@ namespace Http
 
         return false;
     }
+
+
     void HttpDeal::sendFile(const std::string&name  )
     {
         std::shared_ptr<const HtmlFile> file;
@@ -96,6 +98,7 @@ namespace Http
         mes = message.dealMessage("ok");
 
         LOG_HTTP << "send size:" << mes.size() << Log::end;
+
 
         conn_.sendWithFile(mes,file->path());
     }

@@ -55,7 +55,7 @@ namespace Log
 
 const bool enableDebug = 1;
 
-const bool enableHttpDebug = 1;
+const bool enableHttpDebug = 0;
 
 const Log::LogLevel logLevel = Log::LogLevel::DEBUG_;
 

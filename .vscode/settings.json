@@ -62,7 +62,8 @@
         "iomanip": "cpp",
         "filesystem": "cpp",
         "cassert": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "unordered_set": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -28,7 +28,7 @@ namespace Http
     class HttpMessage
     {
     public:
-        HttpMessage(HttpReplyMode mod = Http400, HttpVersion version = Http11)
+        HttpMessage(HttpReplyMode mod = Http200, HttpVersion version = Http11)
             : mod_(mod), version_(version)
         {
         }

@@ -17,6 +17,7 @@ Buffer::Buffer()
 
     assert(readBuf_ != nullptr);
     assert(sendBuf_ != nullptr);
+    assert(sendBuf_ !=readBuf_);
 }
 
 Buffer::~Buffer()
@@ -120,6 +121,9 @@ bool Buffer::sendSendable(int fd)
 
 void Buffer::sendMessage(const std::string &mes) //缓存等待发送的数据
 {
+
+    assert(sendIndex2_==0 ||sendIndex1_);
+
     int n = mes.size();
     
     if(n>maxSendSize_) return;
