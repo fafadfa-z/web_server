@@ -32,7 +32,7 @@ public:
     using NewconnFunction   = std::function<void(TCPConnection*)>;
     using ReadableFunction  = std::function<void(TCPConnection*)>;
 
-    static std::shared_ptr<TCPServer> init(TcpAddrPtr listenAddr, int num);
+    static std::shared_ptr<TCPServer> init(int num);
 
     ~TCPServer();
 
@@ -57,14 +57,12 @@ private:
 
     // void removeConnection(std::string index);
 
-    TCPServer(TcpAddrPtr listenAddr, int threadNum);
+    TCPServer(int threadNum);
 
 private:
     std::shared_ptr<ThreadPool> pool_;      //线程池
 
     std::unique_ptr<Acceptor> connRecv_;    //io副用
-
-    TcpAddrPtr listenAddr_;                 //监听的地址
 
     ReadableFunction readableCallBack_;
     NewconnFunction  connectCallBack_;

@@ -4,21 +4,20 @@
 #include "tcp_channel.h"
 typename std::shared_ptr<TCPServer> TCPServer::entity_ = nullptr;
 
-std::shared_ptr<TCPServer> TCPServer::init(TcpAddrPtr listenAddr, int num) //创建服务器对象实例
+std::shared_ptr<TCPServer> TCPServer::init(int num) //创建服务器对象实例
 {
     if (!entity_)
     {
         LOG_DEBUG << "创建 TCPserver" << Log::end;
-        entity_.reset(new TCPServer(listenAddr, num));
+        entity_.reset(new TCPServer(num));
     }
     return entity_;
 }
 
-TCPServer::TCPServer(TcpAddrPtr listenAddr, int threadNum)
-    : listenAddr_(listenAddr), threadNum_(threadNum)
+TCPServer::TCPServer(int threadNum)
+    :threadNum_(threadNum)
 {
-    connRecv_ = std::make_unique<EpollConnect>(*listenAddr,
-                                               [this](int fd)
+    connRecv_ = std::make_unique<EpollConnect>([this](int fd)
                                                { pool_->pushConnect(fd); }); //这地方以后要用工厂模式                                       
 }
 

@@ -1,15 +1,17 @@
 #include <iostream>
 
+#include "http_server.h"
 #include "tcp_server.h"
 #include "logger.h"
-
-#include "http_server.h"
+#include "local_message.h"
 
 std::shared_ptr<TCPServer> server;
 
 int main()
 {
     std::cout << "hellow! " << std::endl;
+
+    Base::LocalMassage::readConfig("/root/web_server/config.conf");
 
     Log::init();
 

@@ -12,8 +12,6 @@ namespace Http
 {
     thread_local  std::map<int,std::unique_ptr<HttpRequest>> HttpServer::questMap_;
 
-    const std::string HttpServer::sourcePath_ =
-        "/root/web_server/HtmlFiles";
 
     HttpServer *HttpServer::entity = nullptr;
 
@@ -63,11 +61,11 @@ namespace Http
     }
 
     HttpServer::HttpServer()
-        : connCount(0), WebResources_(sourcePath_)
+        : connCount(0), WebResources_()
     {
         auto address = std::make_shared<TCPAddr>("192.168.1.100", 8848);
 
-        tcpServer_ = TCPServer::init(address, 1);
+        tcpServer_ = TCPServer::init(5);
 
         tcpServer_->setReadableCallBack(std::bind(&HttpServer::dealMessage, *this, std::placeholders::_1));
         // tcpServer_->setConnectCallBack([this](TCPConnectionPtr conn) -> void

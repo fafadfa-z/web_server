@@ -1,16 +1,16 @@
 #include "tcp_acceptor.h"
-#include <exception>
 #include "logger.h"
+#include "local_message.h"
 
+#include <exception>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
-Acceptor::Acceptor(TCPAddr addr,std::function<void(int)>submit)
-    :submitCallBack_(submit),
-     addr_(addr)
+Acceptor::Acceptor(std::function<void(int)>submit)
+    :submitCallBack_(submit)
 {
 
 }
@@ -42,7 +42,9 @@ void Acceptor::Loop()
     LOG_DEBUG << "acceptor listen end......." << Log::end;
 }
 int  Acceptor::createListenSocket()
-{
+{   
+    auto port=Base::LocalMassage::port();
+
     auto soc=socket(PF_INET, SOCK_STREAM, 0);
 
     assert(soc>=0);
@@ -58,7 +60,7 @@ int  Acceptor::createListenSocket()
 
     address.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    address.sin_port = htons(addr_.port());
+    address.sin_port = htons(port);
 
     auto res = bind(soc, (sockaddr *)&address, sizeof(address));
 

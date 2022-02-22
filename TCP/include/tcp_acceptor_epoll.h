@@ -16,8 +16,8 @@
 class EpollConnect:public Acceptor
 {
 public:
-    EpollConnect(TCPAddr addr,std::function<void(int)>submitFun)
-        :Acceptor(addr,submitFun)
+    EpollConnect(std::function<void(int)>submitFun)
+        :Acceptor(submitFun)
     {
     }
     ~EpollConnect();

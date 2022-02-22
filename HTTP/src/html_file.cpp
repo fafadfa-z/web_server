@@ -1,19 +1,23 @@
 #include "html_file.h"
 
+#include "local_message.h"
+
 namespace fs = std::filesystem;
 
 namespace Http
 {
-    WebResources::WebResources(const std::string &resoutcePath)
+    WebResources::WebResources()
         : num_(0)
     {
-        findFile(resoutcePath);
+        findFile();
 
         LOG_HTTP << "Find " << num_ << " HTML files.." << Log::end;
     }
 
-    void WebResources::findFile(const std::string &path)
+    void WebResources::findFile()
     {
+        std::string path=Base::LocalMassage::htmlPath();
+
         fs::path filePath(path);
 
         fs::directory_entry direEntry(filePath);

@@ -26,10 +26,7 @@ namespace Base
 
        closeFile();
     }
-    int FileRead::read(std::string& buf,int index,int maxSize)
-    {
-        return 0;
-    }
+  
 
     FileRead::~FileRead()
     {

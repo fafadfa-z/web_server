@@ -43,7 +43,7 @@ namespace Http
 
         static HttpServer *entity;
 
-        static const std::string sourcePath_;
+  
         static thread_local mapType questMap_;
     };
 }

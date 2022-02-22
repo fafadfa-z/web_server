@@ -3,9 +3,6 @@
 #include "tcp_channel.h"
 #include "local_message.h"
 
-
-
-
 PoolProcess::PoolProcess()
     :epollFd_(epoll_create(5)),
     timeout_(1000)

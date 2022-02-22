@@ -9,7 +9,7 @@
 class Acceptor
 {
 public:
-    Acceptor(TCPAddr,std::function<void(int)>);
+    Acceptor(std::function<void(int)>);
 
     virtual  ~Acceptor();
 
@@ -21,9 +21,6 @@ public:
     {
         return begin(createListenSocket());
     }
-
-    const TCPAddr& addr()const {return addr_;}
-
 
     void closeLoop() { looping_=false;};    //直接将标志位置零
 
@@ -43,8 +40,6 @@ private:
     void Loop();
 
     std::atomic<bool> looping_;
-
-    TCPAddr addr_;
 
     std::thread acceptThread_;
 };

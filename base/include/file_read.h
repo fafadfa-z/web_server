@@ -18,7 +18,13 @@ public:
 
     void read(std::string& buf);
 
-    int  read(std::string& buf,int index,int maxSize=16*1024);
+    bool readLine(std::string& mes)
+    {
+        char buf[1024]={0};
+        file_.getline(buf,1024,'\n');
+        mes=buf;
+        return !file_.eof();
+    }
 
     ~FileRead();
 
