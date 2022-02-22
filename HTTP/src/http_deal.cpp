@@ -25,7 +25,6 @@ namespace Http
         case Get:
         {
             sendFile(fileName);
-
             return true;
         }
         case Post:
@@ -119,8 +118,6 @@ namespace Http
                 assert(equal != temp);
 
                 entityMap_.insert({std::string(left, equal), std::string(equal + 1, temp)});
-
-                std::cout<<"Insert: "<<std::string(left, equal)<<" = "<<std::string(equal + 1, temp)<<std::endl;
 
                 left = temp + 1;
             }

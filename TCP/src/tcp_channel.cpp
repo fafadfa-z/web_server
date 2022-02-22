@@ -118,7 +118,6 @@ void Channel::sendWithFile(const std::string &message, const std::filesystem::pa
 
 bool  Channel::sendFile()
 {
-    assert(fileIndex_==0);
     fileIndex_=::sendfile(fd_,fileFd_,&fileIndex_,fileSize_);
 
     if(fileIndex_==fileSize_)
@@ -127,7 +126,6 @@ bool  Channel::sendFile()
         ::close(fileFd_);
         return false;
     }
-    //std::cout<<"一次没发完"<<std::endl;
     return true; //需要重复发送
 }
 

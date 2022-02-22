@@ -5,15 +5,10 @@
 namespace Log
 {
 
-    const char *logPath = "/root/web_server/log_file/";
-
     const int LogThread::maxBufSize = 1000 * 1024;
-    
-  
 
     LogThread::LogThread()
         :logger(new Logger(std::bind(&LogThread::apendMessage,this,std::placeholders::_1,std::placeholders::_2))),
-         logFile_(logPath),
          currentBuf_(new char[maxBufSize]),
          currentBufIndex_(0),
          preBuf_(new char[maxBufSize])

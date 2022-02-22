@@ -12,7 +12,7 @@ namespace Log
     class LogFile
     {
     public:
-        explicit LogFile(const char* fileName);
+        LogFile();
 
         ~LogFile();
 

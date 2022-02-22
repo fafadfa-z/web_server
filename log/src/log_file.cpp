@@ -1,19 +1,19 @@
 #include "log_file.h"
 
 #include "time_point.h"
-
+#include "local_message.h"
 
 namespace Log
 {
-    LogFile::LogFile(const char *fileName)
+    LogFile::LogFile()
         : writeBytes_(0),
           maxSizePreFile_(100 * 1024 * 1024), // 100Mb
-          fileCount_(1),
-          fileName_(fileName)
+          fileCount_(1)
     {
+        fileName_=Base::LocalMassage::logPath();
         Time::timePoint time(Time::getNowTime());
 
-        std::string name(fileName);
+        std::string name(fileName_);
 
         name += time.toLogFileName();
 
