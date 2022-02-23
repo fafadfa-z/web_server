@@ -1,5 +1,7 @@
 #include <iostream>
 #include <unordered_set>
+#include <vector>
+#include <string>
 
 using namespace std;
 
@@ -32,26 +34,20 @@ public:
 
 };
 
-int main11(int argc, char *argv[])
+int main1(int argc, char *argv[])
 {
-	char a=0;
+	vector<string>vec={"1,2,3,4,5"};
 
-	char *p=&a;
-	char *q=p+1;
+	vec.reserve(10);
 
-	std::cout<<reinterpret_cast<unsigned long>(p)<<std::endl;
-	std::cout<<reinterpret_cast<unsigned long>(q)<<std::endl;	
+	string& str=vec[0];
 
+	for(int i=0;i<1;i++)
+	{
+		vec.push_back(std::to_string(i));
+	}
 
-	// std::unordered_set<mytype,hash_value> se;
-
-	// mytype a{1,2};
-	// mytype b{2,3};
-
-	
-
-	// se.insert(a);
-	// se.insert(b);
+	cout<<str<<endl;
 
 	
 	return 0;

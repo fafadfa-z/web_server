@@ -1,9 +1,12 @@
 #include <iostream>
+#include <chrono>
 
 #include "http_server.h"
 #include "tcp_server.h"
 #include "logger.h"
 #include "local_message.h"
+
+
 
 std::shared_ptr<TCPServer> server;
 
@@ -11,7 +14,7 @@ int main()
 {
     std::cout << "hellow! " << std::endl;
 
-    Base::LocalMassage::readConfig("/root/web_server/config.conf");
+    Base::LocalMassage::readConfig("/home/admin/code/web_server/config.conf");
 
     Log::init();
 
@@ -22,7 +25,7 @@ int main()
 
     while(1)
     {   
-        sleep(10);
+       std::this_thread::sleep_for(std::chrono::seconds(10));
     }
     
     return 0;

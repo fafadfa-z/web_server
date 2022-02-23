@@ -12,8 +12,9 @@ using namespace std::chrono;
 namespace MySql_
 {
     inline const char *mySQL_IP = "39.108.131.90";
+    // inline const char *mySQL_IP = "localhost";
     inline const char *mySQL_User = "root";
-    inline const char *mySQL_Password = "123456";
+    inline const char *mySQL_Password = "root";
     inline const char *mySQL_Database = "webserver";
     inline const int mySQL_Port = 3306;
 

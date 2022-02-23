@@ -61,6 +61,10 @@ namespace Http
                 LOG_HTTP << "新用户注册!" << Log::end;
                 sendFile("/submit.html");
             }
+            else if (entityMap_.find("new_player") != entityMap_.end()) //提交注册信息。
+            {
+                addNewPlayer();
+            }
             else
             {
                 LOG_HTTP << "excepted..." << Log::end;
@@ -74,6 +78,41 @@ namespace Http
 
         return false;
     }
+
+
+    bool HttpDeal::addNewPlayer() //添加新用户
+    {
+        auto iterName= entityMap_.find("username");
+        auto iterPassowrd= entityMap_.find("pwd");
+        auto iterRepeat = entityMap_.find("rep_pwd");
+
+        assert(iterName!=entityMap_.end());
+        assert(iterPassowrd!=entityMap_.end());
+        assert(iterRepeat!=entityMap_.end());
+
+        if(iterPassowrd->second!=iterRepeat->second) 
+        {
+            sendFile("/failed_player.html");
+            return false;
+        }
+
+        LOG_DEBUG<<"insert new player"<<Log::end;
+
+        MySql_::MySqlBuf sql;
+
+        auto ret = sql.newPlayer(iterName->second,iterPassowrd->second);
+
+        
+        if(ret) //成功了
+        {
+            sendFile("/success_player.html");
+            return true;
+        }
+        else sendFile("/failed_player.html");
+
+        return false;
+    }
+
 
 
     void HttpDeal::sendFile(const std::string&name  )
@@ -128,7 +167,6 @@ namespace Http
         assert(equal != right);
 
         entityMap_.insert({std::string(left, equal), std::string(equal + 1, right)});
-        std::cout<<"Insert: "<<std::string(left, equal)<<" = "<<std::string(equal + 1, right)<<std::endl;
     }
 
     void HttpDeal::sendBadMessage()

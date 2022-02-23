@@ -32,6 +32,8 @@ namespace Http
 
         void sendFile(const std::string&);  //����w
 
+        bool addNewPlayer();  //处理系用户注册的信息。
+
     private:
         std::map<std::string,std::string> entityMap_;
 

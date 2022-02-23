@@ -107,7 +107,7 @@ namespace Http
 
         return true;
     }
-    void HttpServer::dealMessage(TCPConnection *conn)
+    void HttpServer::dealMessage(TCPConnection *conn) //处理http请求的主函数
     {
         LOG_HTTP << "Begin dealMessage..." << Log::end;
 
@@ -128,7 +128,7 @@ namespace Http
 
             auto ret=handleMes(conn,*quest);
             
-            if(ret==false) 
+            if(ret==false)   //如果单词没有处理完，则分到这个里面。
                 questMap_.insert({conn->fd(),std::move(quest)});
             else 
             {
