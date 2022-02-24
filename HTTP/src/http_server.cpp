@@ -63,7 +63,6 @@ namespace Http
     HttpServer::HttpServer()
         : connCount(0), WebResources_()
     {
-        auto address = std::make_shared<TCPAddr>("192.168.1.100", 8848);
 
         tcpServer_ = TCPServer::init(5);
 

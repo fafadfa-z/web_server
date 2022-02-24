@@ -12,7 +12,7 @@
 
 namespace Log
 {
-  extern LogThread *entity;
+  extern  LogThread *entity;
  
   LogThread* init();
 
@@ -29,51 +29,54 @@ namespace Log
   public:
     Logger(std::function<void(char *, int)>);
 
-    const char *levelToStr(const LogLevel);
+    constexpr char const *levelToStr();
 
-    LogStream &receive(const char *fileName, int line, const char *funName, LogLevel level);
+    LogStream &receive(const char *fileName, int line, const char *funName);
 
     unsigned int findFileName(const char *);
 
     std::string dealFunName(const char *funName);
 
-  private:
-    void dealLogStr(const char *, std::string &buf, unsigned long maxSize = 15);
+    static void resizeBuf()
+    {
+      fileN.resize(maxNameSize);
+      funN.resize(maxNameSize);
+    }
 
-    std::string fileN;  //文件名
-    std::string funN;   //函数名
-    std::string levelS; // log等级
+  private:
+    void dealLogStr(const char *, std::string &buf,int maxSize = 15);
+
+    inline static thread_local std::string fileN;  //文件名
+    inline static thread_local std::string funN;   //函数名
 
     LogStream stream_;
 
     static const int maxNameSize = 25; //文件名等缓冲区的最大容量
   };
 
-  LogStream& end(LogStream& stream);
+  LogStream& end(LogStream& stream);  //流结束标志
 
 }  // namespace Log
 
-const bool enableDebug = 1;
+const bool enableHttpDebug = false;
 
-const bool enableHttpDebug = 0;
-
-const Log::LogLevel logLevel = Log::LogLevel::DEBUG_;
+constexpr Log::LogLevel logLevel = Log::LogLevel::DEBUG_;
 
 #define LOG_INFO                        \
-  if (logLevel <= Log::LogLevel::INFO_) \
-  Log::entity->logger->receive(__FILE__, __LINE__, __func__, Log::INFO_)
+  if constexpr(logLevel <= Log::LogLevel::INFO_) \
+  Log::entity->logger->receive(__FILE__, __LINE__, __func__)
 
 #define LOG_DEBUG                        \
-  if (logLevel <= Log::LogLevel::DEBUG_) \
-  Log::entity->logger->receive(__FILE__, __LINE__, __func__, Log::DEBUG_)
+  if constexpr(logLevel <= Log::LogLevel::DEBUG_) \
+  Log::entity->logger->receive(__FILE__, __LINE__, __func__)
 
 #define LOG_FATAL                        \
-  if (logLevel <= Log::LogLevel::FATAL_) \
-  Log::entity->logger->receive(__FILE__, __LINE__, __func__, Log::FATAL_)
+  if constexpr(logLevel <= Log::LogLevel::FATAL_) \
+  Log::entity->logger->receive(__FILE__, __LINE__, __func__)
 
 #define LOG_HTTP       \
-  if (enableHttpDebug) \
-  Log::entity->logger->receive(__FILE__, __LINE__, __func__, Log::HTTP_)
+  if constexpr(enableHttpDebug) \
+  Log::entity->logger->receive(__FILE__, __LINE__, __func__)
 
 #define LOG_COUT std::cout
 

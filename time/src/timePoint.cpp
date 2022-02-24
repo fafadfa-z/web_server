@@ -29,9 +29,9 @@ namespace Time
 
         gmtime_r(&value, &tm_time);
 
-        char buf[64] = {0};
+        std::string buf(64,0);
 
-        snprintf(buf, sizeof(buf), "%02d:%02d:%02d.%06ld",
+        snprintf(buf.data(),buf.size(), "%02d:%02d:%02d.%06ld",
                  tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec,
                  (count)%1000'000);
 

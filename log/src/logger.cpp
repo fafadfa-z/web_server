@@ -2,6 +2,8 @@
 #include "time_point.h"
 #include "local_message.h"
 
+#include <algorithm>
+
 namespace Log
 {
     LogThread *entity = nullptr;
@@ -17,14 +19,13 @@ namespace Log
 
 
     Logger::Logger(std::function<void(char *, int)> cb)
-        : fileN(maxNameSize, '0'), funN(maxNameSize, '0'), levelS(maxNameSize, '0')
     {
         stream_.setCallBack(cb);
     }
 
-    const char *Logger::levelToStr(const LogLevel level)
+    constexpr char const *Logger::levelToStr()
     {
-        switch (level)
+        switch (logLevel)
         {
         case INFO_:
             return "Info: ";
@@ -52,16 +53,14 @@ namespace Log
     //     return ans;
     // }
 
-    void Logger::dealLogStr(const char *str, std::string &buf, unsigned long maxSize) //将字符串格式化成固定长度
+    void Logger::dealLogStr(const char *str, std::string &buf, int maxSize) //将字符串格式化成固定长度
     {
 
-        if (maxSize > maxNameSize - 1)
-            maxSize = maxNameSize - 1;
+        maxSize=std::min(maxSize,maxNameSize-1);
 
-        auto size = strlen(str);
+        int size = static_cast<int>(strlen(str));
 
-        if (size > maxSize)
-            size = maxSize;
+        size=std::min(size,maxSize);
 
         ::memcpy(&buf[0], str, size);
 
@@ -75,7 +74,7 @@ namespace Log
     }
 
 
-    LogStream &Logger::receive(const char *fileName, int line, const char *funName, LogLevel level)
+    LogStream &Logger::receive(const char *fileName, int line, const char *funName)
     {
         Time::timePoint time(Time::getNowTime());
 
@@ -83,14 +82,7 @@ namespace Log
 
         dealLogStr(funName,funN);
 
-        dealLogStr(levelToStr(level),levelS,10);
-
-        // ::snprintf(logMessageBuffer, logMessageSize, "%s\t%-5d\t%-15.15s\t%-5d\t%-15.15s\t%-10.10s",
-        //            time.toLogString().c_str(), getTid(), fileName + findFileName(fileName), line, funName, levelToStr(level));
-
-        //stream_<<logMessageBuffer;
-
-        stream_<< time.toLogString()<<"\t"<<getTid()<<"\t"<<&fileN[0]<<"\t"<<line<<"\t"<<&funN[0]<<"\t"<<&levelS[0];
+        stream_<< time.toLogString()<<"\t"<<getTid()<<"\t"<<&fileN[0]<<"\t"<<line<<"\t"<<&funN[0]<<"\t"<<levelToStr();
 
         return stream_;
     }

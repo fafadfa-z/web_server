@@ -13,6 +13,9 @@ namespace Log
          currentBufIndex_(0),
          preBuf_(new char[maxBufSize])
     {   
+
+        Logger::resizeBuf();
+
         auto logThread = std::thread(std::bind(&LogThread::logLoop,this));
 
         logThread.detach();              
@@ -51,7 +54,7 @@ namespace Log
 
     void LogThread::changeBuf()
     {
-        readyBuf_.push_back(std::pair<char *, int>(currentBuf_, currentBufIndex_));
+        readyBuf_.push_back(std::pair(currentBuf_, currentBufIndex_));
 
         if (preBuf_)
         {
