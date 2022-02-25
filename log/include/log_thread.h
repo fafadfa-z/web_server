@@ -5,6 +5,7 @@
 #include <queue>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <iostream>
 #include <memory>
 
@@ -14,6 +15,7 @@
 #include <cassert>
 
 #include "log_file.h"
+#include"safe_queue.h"
 
 namespace Log
 {
@@ -22,6 +24,7 @@ namespace Log
 
     class LogThread
     {
+        using BufType=std::deque<std::pair<std::vector<char>,int>>;
     public:
         ~LogThread();
 
@@ -29,33 +32,41 @@ namespace Log
 
         void apendMessage(char *line, unsigned int size); //这里size不包含 '\0'
 
-        unsigned int freeSize() { return static_cast<unsigned int>(maxBufSize - currentBufIndex_); }
+        int freeSize() { return bufSize_ - currentBufIndex_; }
 
         void changeBuf();
 
         void logLoop();
 
-        std::shared_ptr<Logger> logger;
+        std::shared_ptr<Logger> logger_;
 
     private:
         LogThread();
-        void flushToFile(std::vector<std::pair<char *, int>> &buf);
-        void deleteBuf(std::vector<std::pair<char *, int>> &buf, size_t beginIndex);
+        void flushToFile();
 
         LogFile logFile_;
 
-        bool logging_;
+    private:
 
-        char *currentBuf_;
+        std::vector<char> currentBuf_;
+        
+        Base::MyQueue<std::vector<char>> preBuf_;
         int currentBufIndex_;
-        char *preBuf_;
-
-        std::vector<std::pair<char *, int>> readyBuf_;
-        std::vector<std::pair<char *, int>> bufToWrite_;
+        
+        BufType readyBuf_;
+        BufType bufToWrite_;
 
         std::mutex mut_;
+        std::condition_variable waiter_;
 
-        static const int maxBufSize;
+
+    private:
+        inline static thread_local std::vector<char>threadBuf_;   //线程本地缓冲区
+        inline static thread_local int threadIndex_;
+
+        inline static const int threadBufSize_=10 * 1024;  //线程自己的日志缓冲
+        inline static const int bufSize_=100 * 1024;       //一块日志缓冲区的大小
+        inline static const int bufNum_=5;                 //可以保存的内存块数
     };
 
 

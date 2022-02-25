@@ -1,25 +1,63 @@
 #ifndef _SAFE_QUEUE_H
 #define _SAFE_QUEUE_H
 
-#include<queue>
+#include<deque>
+#include<mutex>
+#include<optional>
+using std::deque;
 
-using std::queue;
 
-template<typename T>
-class MyQueue
+
+namespace Base
 {
-public:
-    virtual bool empty();
+    template<typename T>
+    class MyQueue
+    {
+    public:
+        MyQueue(int size)
+            :maxSize_(size)
+        {
+
+        }
+
+
+        bool empty()
+        {
+            std::lock_guard<std::mutex>guard(mut_);
+            return que_.empty();
+        }
     
-    virtual bool try_pop(T&);
+        std::optional<T> try_pop()
+        {
+            std::lock_guard<std::mutex>guard(mut_);
+            if(que_.empty())
+                return std::nullopt;
 
-    virtual bool push(T);
+            auto ret=std::move(que_.back()); 
+            que_.pop_back();
+            return ret;
+        }
 
-    virtual ~MyQueue()=0;    // effective 中写过将析构函数定义为纯虚函数?
-private:
-    queue<T>que_;   
+        bool push(T&& element)
+        {
+            std::lock_guard<std::mutex>guard(mut_);
+            if(que_.size()==maxSize_)
+                return false;
 
+            que_.push_back(std::move(element));
+            return true;
+        }
+        int size()
+        {
+            std::lock_guard<std::mutex>guard(mut_);
+            return que_.size();
+        }
 
-};
+    private:
+        deque<T>que_;   
+        size_t maxSize_;
+        std::mutex mut_;
+    };
+}
 
 #endif

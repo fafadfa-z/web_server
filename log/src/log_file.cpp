@@ -35,6 +35,9 @@ namespace Log
         ::fclose(fp_);
     }
 
+    #include<string_view>
+
+
     void LogFile::writeMessage(const char *message, size_t len)
     {
         assert(len>=0);
@@ -60,7 +63,6 @@ namespace Log
         writeBytes_ += written;
         if (static_cast<unsigned long>(writeBytes_) > maxSizePreFile_)
         {
-            std::cout<<"change Log file....\n";
             changeFile();
         }
     }
@@ -71,8 +73,6 @@ namespace Log
 
     void LogFile::changeFile()     //当文件写入数量足够的时候，换文件
     {
-        std::cout << "Change file.....\n";
-
         Time::timePoint time(Time::getNowTime());
 
         auto name = (fileName_);
@@ -98,7 +98,7 @@ namespace Log
 
     void LogFile::getNum(char *buf)
     {
-        int temp = fileCount_;
+        int temp = fileCount_++;
         *buf++ = '_';
         while (temp)
         {

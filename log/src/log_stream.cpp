@@ -128,6 +128,7 @@ namespace Log
     LogStream& end(LogStream& stream)
     {
         char *buf=stream.buf_.data(); 
+
         int size=stream.buf_.writeIndex();
         buf[size]='\r';
         buf[size+1]='\n';

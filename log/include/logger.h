@@ -64,19 +64,19 @@ constexpr Log::LogLevel logLevel = Log::LogLevel::DEBUG_;
 
 #define LOG_INFO                        \
   if constexpr(logLevel <= Log::LogLevel::INFO_) \
-  Log::entity->logger->receive(__FILE__, __LINE__, __func__)
+  Log::entity->logger_->receive(__FILE__, __LINE__, __func__)
 
 #define LOG_DEBUG                        \
   if constexpr(logLevel <= Log::LogLevel::DEBUG_) \
-  Log::entity->logger->receive(__FILE__, __LINE__, __func__)
+  Log::entity->logger_->receive(__FILE__, __LINE__, __func__)
 
 #define LOG_FATAL                        \
   if constexpr(logLevel <= Log::LogLevel::FATAL_) \
-  Log::entity->logger->receive(__FILE__, __LINE__, __func__)
+  Log::entity->logger_->receive(__FILE__, __LINE__, __func__)
 
 #define LOG_HTTP       \
   if constexpr(enableHttpDebug) \
-  Log::entity->logger->receive(__FILE__, __LINE__, __func__)
+  Log::entity->logger_ ->receive(__FILE__, __LINE__, __func__)
 
 #define LOG_COUT std::cout
 

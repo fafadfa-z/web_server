@@ -34,21 +34,21 @@ public:
 
 };
 
-int main1(int argc, char *argv[])
-{
-	vector<string>vec={"1,2,3,4,5"};
+#include "logger.h"
+#include "local_message.h"
 
-	vec.reserve(10);
 
-	string& str=vec[0];
+int main111(int argc, char *argv[])
+{	
 
-	for(int i=0;i<1;i++)
+	Base::LocalMassage::readConfig("/home/admin/code/web_server/config.conf");
+ 	Log::init();
+
+	while(1)
 	{
-		vec.push_back(std::to_string(i));
+		LOG_FATAL<<"1234567890"<<Log::end;
 	}
 
-	cout<<str<<endl;
 
-	
 	return 0;
 }

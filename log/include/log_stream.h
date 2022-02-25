@@ -7,7 +7,7 @@
 #include <cassert>
 #include <algorithm>
 #include <iostream>
-
+#include <string_view>
 
 namespace Log
 {
@@ -26,7 +26,12 @@ namespace Log
             return *this;
         }
 
-        LogStream &operator<<(std::string str)
+        LogStream &operator<<(std::string_view str)
+        {
+            buf_.writeIn(str.data(), str.size());
+            return *this;
+        }
+        LogStream &operator<<(std::string&& str)
         {
             buf_.writeIn(str.c_str(), str.size());
             return *this;

@@ -4,17 +4,24 @@
 
 namespace Log
 {
+    const char* overFlowMes="LOG FATAL: buf over flow!\n";
 
-    const int LogThread::maxBufSize = 1000 * 1024;
 
     LogThread::LogThread()
-        :logger(new Logger(std::bind(&LogThread::apendMessage,this,std::placeholders::_1,std::placeholders::_2))),
-         currentBuf_(new char[maxBufSize]),
-         currentBufIndex_(0),
-         preBuf_(new char[maxBufSize])
+        :logger_(new Logger(std::bind(&LogThread::apendMessage,this,std::placeholders::_1,std::placeholders::_2))),
+         currentBuf_(bufSize_),
+         preBuf_(bufNum_),
+         currentBufIndex_(0)
     {   
-
         Logger::resizeBuf();
+
+        assert(bufNum_>=2);
+
+        for(int i=0;i<bufNum_-1;i++)
+            preBuf_.push(std::vector<char>(bufSize_));
+        
+
+
 
         auto logThread = std::thread(std::bind(&LogThread::logLoop,this));
 
@@ -23,13 +30,6 @@ namespace Log
 
     LogThread::~LogThread()
     {
-        delete[] currentBuf_;
-        delete[] preBuf_;
-
-        for (auto temp : readyBuf_)
-        {
-            delete[] temp.first;
-        }
     }
 
     LogThread *LogThread::init()
@@ -43,91 +43,99 @@ namespace Log
 
     void LogThread::apendMessage(char *line, unsigned int size)
     {
-        std::lock_guard<std::mutex> guard(mut_);
-        auto temp=static_cast<unsigned int>(freeSize());
-        if (temp < size)
-            changeBuf(); //更换新的缓存
+        assert(size>25);
 
-        ::memcpy(currentBuf_ + currentBufIndex_, line, size);
-        currentBufIndex_ += size;
+        if (__builtin_expect(static_cast<int>(threadBuf_.size())<threadBufSize_ , 0))
+            threadBuf_.resize(threadBufSize_);
+
+        if(threadIndex_+size<threadBufSize_) //缓冲区足够
+        {
+            ::memcpy(&threadBuf_[0] + threadIndex_, line, size);
+            threadIndex_ += size;
+        }
+        else //缓冲区不够了，需要提交数据
+        {
+            std::lock_guard<std::mutex> guard(mut_);
+            auto temp=freeSize();
+
+            assert(temp>=0);
+
+            bool flag=false;
+
+            if (temp < (int)threadIndex_)
+            {
+                flag = true;
+                changeBuf(); //更换新的缓存
+            }
+
+            ::memcpy(&currentBuf_[0] + currentBufIndex_, &threadBuf_[0], threadIndex_);
+            currentBufIndex_ += threadIndex_;
+
+            threadIndex_=0;
+
+            if(flag)
+            {
+                mut_.unlock();
+                waiter_.notify_one();  //唤醒工作线程
+            }
+        }     
     }
 
     void LogThread::changeBuf()
-    {
-        readyBuf_.push_back(std::pair(currentBuf_, currentBufIndex_));
-
-        if (preBuf_)
+    { 
+        auto buf=preBuf_.try_pop();
+        
+        if(buf!=std::nullopt) 
         {
-            currentBuf_ = preBuf_;
-            preBuf_ = nullptr;
+            readyBuf_.emplace_back(std::exchange(currentBuf_,std::move(buf.value())),currentBufIndex_);
+            currentBufIndex_ = 0;
         }
-        else
+        else  //如果没有空闲内存了，直接覆盖一个最旧的数据
         {
-            std::cout << "额外的日至缓存...." << std::endl;
-            currentBuf_ = new char[maxBufSize];
+            ::strcpy(currentBuf_.data(), overFlowMes); //插入丢弃数据的信息。
+            currentBufIndex_ = sizeof(overFlowMes); 
         }
-        currentBufIndex_ = 0;
     }
 
     void LogThread::logLoop()
     {
         bool logging_ = true;
 
-    std::cout << "Log thread begin...." << std::endl;
+        std::cout << "Log thread begin...." << std::endl;
         while (logging_)
         {
             {
-                if (readyBuf_.empty())
-                    sleep(1);
-                std::lock_guard<std::mutex> guard(mut_);
-
-                //std::cout <<currentBuf_<< std::endl;
-
-                changeBuf();
-
+                std::unique_lock<std::mutex> guard(mut_);
+                while(readyBuf_.empty())
+                    waiter_.wait(guard);
+                
                 assert(bufToWrite_.empty());
 
-                bufToWrite_.swap(readyBuf_);
+                bufToWrite_.swap(readyBuf_);  //交换缓冲区
             }
 
-            if (bufToWrite_.size() > 2)
-            {
-                std::cout << "Log system: too many Log...\n";
-
-                bufToWrite_.erase(bufToWrite_.begin() + 2, bufToWrite_.end());
-            }
-            flushToFile(bufToWrite_);
-
-            if (!preBuf_)
-            {
-                preBuf_ = bufToWrite_[0].first;
-
-                deleteBuf(bufToWrite_, 1);
-            }
-            else
-                deleteBuf(bufToWrite_, 0);
+            assert(bufToWrite_.size()<=5);
+            
+            flushToFile();   // 落盘
 
             logFile_.flush();
-            bufToWrite_.clear();
         }
     }
 
-    void LogThread::flushToFile(std::vector<std::pair<char*,int>>&buf)
+    void LogThread::flushToFile()
     {
-        for (auto temp : buf)
-        {
-            logFile_.writeMessage(temp.first, temp.second);
-        }
-    }
-    void LogThread::deleteBuf(std::vector<std::pair<char *, int>> &buf, size_t beginIndex)
-    {
-        size_t size=static_cast<size_t>(buf.size());
-        for (size_t i = beginIndex; i < size; i++)
-        {
-            delete[] buf[i].first;
-        }
+        int size=bufToWrite_.size();
 
-        buf.clear();
+        for(int i=0;i<size;i++)
+        {
+            auto temp=std::move(bufToWrite_.back());
+            bufToWrite_.pop_back();
+
+            logFile_.writeMessage(temp.first.data(), temp.second);
+
+            preBuf_.push(std::move(temp.first));
+        }
     }
+
 
 } // namespace Log
