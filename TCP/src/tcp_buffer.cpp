@@ -4,6 +4,7 @@
 
 
 #include "tcp_buff_pool.h"
+#include "local_message.h"
 
 thread_local std::shared_ptr<BufferPool> Buffer::pool_ = nullptr;
 
@@ -28,13 +29,23 @@ Buffer::~Buffer()
     LOG_INFO << "buffer 析构" << Log::end;
 }
 
-bool Buffer::saveReadable(int fd)
+bool Buffer::saveReadable(int fd, int mod)
 {
     char buf[readSize_] = {0};
 
     LOG_INFO << "read begin: fd=" << fd << Log::end;
 
-    auto n = ::recv(fd, buf, readSize_ - 1, 0);
+    int n=0;
+    if(mod==Base::MOD_LT)
+        n = ::recv(fd, buf, readSize_ - 1, 0);
+    else  // for ET mode.
+    {
+        int size;
+        while((size = ::recv(fd, buf+n, readSize_ - 1, 0))>0) 
+            n+=size;
+        if (size == -1 && errno != EAGAIN)
+            LOG_FATAL<<"read error"<<Log::end;    
+    }
 
     if (n <= 0)
         return false;
@@ -48,7 +59,6 @@ bool Buffer::saveReadable(int fd)
         int resize = readIndex2_ - readIndex1_ + 1 + n;
         LOG_DEBUG << "read Buf need resize: " << resize << Log::end;
 
-        // readIndex_=pool_->changeBuf(readBuf_,readIndex_,readIndex_+n); //����buffer
         char *temp;
         int preSize = ReadBufSize_;
 

@@ -14,7 +14,7 @@ int main()
 {
     std::cout << "hellow! " << std::endl;
 
-    Base::LocalMassage::readConfig("/home/admin/code/web_server/config.conf");
+    Base::LocalMassage::readConfig("/home/admin/program/web_server/config.conf");
 
     Log::init();
 

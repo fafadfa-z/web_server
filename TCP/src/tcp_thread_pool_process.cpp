@@ -6,7 +6,9 @@
 PoolProcess::PoolProcess()
     :epollFd_(epoll_create(5)),
     timeout_(1000)
+    
 {
+    triggerMod_=Base::LocalMassage::triggerMod();
 }
 
 void PoolProcess::operator()()
@@ -45,10 +47,11 @@ void PoolProcess::distribute()
         for (int i = 0; i < messageSize; i++)
         {
             MapType::iterator temp;
-               
+
             temp = channelMap_.find(events_[i].data.fd);
 
             assert(temp != channelMap_.end());
+            
             temp->second->dealEvent(events_[i]);
         }
     }
@@ -74,6 +77,10 @@ void PoolProcess::insertToEpoll(const std::shared_ptr<Channel>& channel)  //这�
 
     int old_option = fcntl(fd, F_GETFL); //设置为非阻塞�?
     int new_opion = old_option | O_NONBLOCK;
+
+    if(triggerMod_==Base::MOD_ET)
+        new_event.events |= EPOLLET;
+
     fcntl(fd, F_SETFL, new_opion);
 
     auto res = epoll_ctl(epollFd_, EPOLL_CTL_ADD, fd, &new_event);
@@ -110,8 +117,6 @@ void PoolProcess::changeEvent(int event, int fd)
     if (res == -1)
     LOG_FATAL << "Change event error" << Log::end;
 }
-
-
 void PoolProcess::weakup(int mes)
 {
     LOG_INFO<<"process weak up!"<<mes<<Log::end;

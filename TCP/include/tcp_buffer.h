@@ -22,7 +22,7 @@ public:
     Buffer();
     ~Buffer();
 
-    bool saveReadable(int fd);
+    bool saveReadable(int fd,int mod);
 
     void clear(char* index);  //��ǰ��������Ƴ�buffer
     void clear();             //�����������Ƴ�
@@ -30,6 +30,8 @@ public:
     void sendMessage(const std::string& mes);
 
     bool sendSendable(int fd);
+  
+
 
     bool sendSize(int n);
 
@@ -54,7 +56,7 @@ private:
     int sendIndex1_;    // 标记读开始的位置
     int sendIndex2_;    // 标记写开始的位置
 
-    static const int readSize_ = 65535;
+    static const int readSize_ = 16*1000;
 
     static const int initSize_ = 2048;
 

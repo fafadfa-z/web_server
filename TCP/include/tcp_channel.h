@@ -45,14 +45,10 @@ public:
 
     ~Channel();
 
-    void readAll(std::vector<char> &);
+    // void readAll(std::vector<char> &);
 
-    void send(const std::string &message)
-    {
-        buf_->sendMessage(message);
+    void send(const std::string &message);
 
-        enableWrite();
-    }
 
     void sendWithFile(const std::string &, const std::filesystem::path &);
 

@@ -21,6 +21,10 @@ inline int getTid()
 }
 namespace Base
 {
+    inline const int MOD_LT=0;
+    inline const int MOD_ET=1;
+
+
     class LocalMassage : public FileRead
     {
     public:
@@ -35,6 +39,7 @@ namespace Base
         static std::string& htmlPath() {return htmlPath_;}
 
         static std::string& logPath() {return logPath_;}
+        static int triggerMod() {return triggerMod_;}
 
     private:
 
@@ -49,6 +54,7 @@ namespace Base
         static inline int linstenPort_=-1;
         static inline std::string htmlPath_;
         static inline std::string logPath_;
+        static inline int triggerMod_= MOD_LT;
 
         static inline LocalMassage *entity_; //单例实体
     };

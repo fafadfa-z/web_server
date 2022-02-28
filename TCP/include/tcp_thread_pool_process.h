@@ -19,6 +19,7 @@
 
 #include "tcp_buff_pool.h"
 
+
 class TCPServer;
 class Channel;
 
@@ -48,15 +49,13 @@ class  FdPack  //为了防止管道粘包，封包和拆宝�?
 
         auto n = ::read(weakUpFd_, &temp, size_);
         assert(n == size_);
-
     }
-
     static void setWeakUpFd(int fd){weakUpFd_=fd;}
 
 private:
     static int  weakUpFd_;
     static const int size_=3;
-
+ 
     int buf_[size_];
 };
 
@@ -82,7 +81,7 @@ public:
 
     void changeEvent(int event,int fd);
 
-     int weakUpFd()const {return pipe_[0];}
+    int weakUpFd()const {return pipe_[0];}
 
     friend Channel;
 
@@ -114,6 +113,8 @@ private:
     const int timeout_;
 
     BuffPoolPtr bufPool_;
+
+    inline static int triggerMod_;
 };
 
 

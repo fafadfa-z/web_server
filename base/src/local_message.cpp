@@ -71,6 +71,17 @@ namespace Base
             htmlPath_=iter->second.substr(index,iter->second.size());
         }
 
+        iter=confMap_.find("trigger_mod");  
+        if(iter!=confMap_.end())
+        {
+            const auto & flag=iter->second;
+             
+            auto temp=flag.find("ET");
+
+            if(temp<flag.size()) triggerMod_=MOD_ET;
+        } 
+
+
         iter=confMap_.find("print message");    
 
         if(iter!=confMap_.end())
