@@ -73,7 +73,7 @@ namespace Log
         buf[maxSize]='\0';
     }
 
-
+    //格式化字符串
     LogStream &Logger::receive(const char *fileName, int line, const char *funName)
     {
         Time::timePoint time(Time::getNowTime());

@@ -127,18 +127,17 @@ namespace Log
 
     LogStream& end(LogStream& stream)
     {
-        char *buf=stream.buf_.data(); 
-
-        int size=stream.buf_.writeIndex();
-        buf[size]='\r';
-        buf[size+1]='\n';
+        auto flag=stream.buf_.writeEnd(); 
 
         assert(stream.updateCallBack_);
 
-        stream.updateCallBack_(buf,size+2);
+        if(flag)
+        {
+            auto [buf,index]=stream.buf_.updateMes();
 
-        stream.buf_.refresh();
-        
+            stream.updateCallBack_(buf,index);
+        }
+
         return stream;
     }
 

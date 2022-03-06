@@ -1,12 +1,30 @@
 #include "log_buffer.h"
-#include  "string.h"
-
+#include "string.h"
 
 namespace Log
 {
-    thread_local char LogBuffer::data_[bufferSize]={0};   //静态成员的构造顺序在这里会不会有影响。
-    thread_local int LogBuffer::writeIndex_=0;
+    bool LogBuffer::writeIn(const char *line, unsigned int size)
+    {
+        if (writeIndex_+size > headLevel)
+            return false;
+
+        ::memcpy(data_ + writeIndex_, line, size);
+
+        writeIndex_ += size;
+
+        return true;
+    }
+    bool LogBuffer::writeEnd()
+    {
+        data_[writeIndex_++]='\r';
+        data_[writeIndex_++]='\n';
+
+        return writeIndex_>=lowLevel;
+    }
+    std::pair<char*,int>LogBuffer::updateMes()
+    {
+        return {data_,writeIndex_};
+    }
 
 
 }
-

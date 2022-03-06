@@ -2,11 +2,15 @@
 #define _LOG_BUFFER_H
 
 #include "string.h"
+#include <map>
 
 namespace Log
 {
 
-    const int bufferSize = 256;
+    constexpr int bufferSize = 10*1024;
+    constexpr int headLevel=bufferSize-3;
+    constexpr int lowLevel=bufferSize-256;
+
 
     class LogBuffer 
     {
@@ -15,28 +19,18 @@ namespace Log
         {
         }
 
-        bool writeIn(const char *line, unsigned int size)
-        {
-            if (avilableSize() < size)
-                return false;
+        bool writeIn(const char *line, unsigned int size);
 
-            ::memcpy(data_+writeIndex_, line, size);
 
-            writeIndex_ += size;
-            return true;
-        }
+        bool writeEnd();
 
-        char* data(){return data_;}
-
-        int writeIndex(){return writeIndex_;}
-
-        unsigned int avilableSize() { return static_cast<unsigned int>(bufferSize - writeIndex_); } //返回当前可写的大小
+        std::pair<char*,int>updateMes(); //返回当前缓冲索引
 
         void refresh(){writeIndex_=0;}
 
     private:
-        static thread_local char data_[bufferSize];
-        static thread_local int writeIndex_;
+        inline static thread_local char data_[bufferSize]={0};
+        inline static thread_local int writeIndex_;
     };
 
 } //namespace Log
