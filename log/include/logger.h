@@ -62,6 +62,7 @@ const bool enableHttpDebug = false;
 
 constexpr Log::LogLevel logLevel = Log::LogLevel::DEBUG_;
 
+//暂时先设计成不支持动态变化日志等级的模式
 #define LOG_INFO                        \
   if constexpr(logLevel <= Log::LogLevel::INFO_) \
   Log::entity->logger_->receive(__FILE__, __LINE__, __func__)

@@ -37,17 +37,17 @@ namespace Http
 
                 auto mes = sql.searchPlayer(entityMap_["username"]);
 
-                if(mes.id_==0) //找不到文件
+                if(mes->id_==0) //找不到文件
                 {
                     sendFile("/failed.html");
                     return false;
                 }
 
-                assert(mes.name_ == entityMap_["username"]);
+                assert(mes->name_ == entityMap_["username"]);
 
                 std::string pass=entityMap_["pwd"];
                 
-                if(mes.password_==pass) //登录成功
+                if(mes->password_==pass) //登录成功
                 {
                     sendFile("/success.html");
                 }

@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <memory>
+
+
 #include "assert.h"
 
 using namespace std::chrono;
@@ -75,10 +78,10 @@ namespace MySql_
     {
     public:
         //根据名字搜索
-        webMes searchByName(const std::string &name);
+        std::shared_ptr<webMes> searchByName(const std::string &name);
 
         //按ID搜索
-        webMes searchByName(int);
+        webMes searchById(int);
         
         bool insert(const std::string&,const std::string&,const time_point<system_clock>&);
 

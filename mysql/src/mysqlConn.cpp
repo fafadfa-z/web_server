@@ -76,7 +76,7 @@ namespace MySql_
         return true;
     }
 
-    webMes SqlMess::searchByName(const std::string &name)
+    std::shared_ptr<webMes> SqlMess::searchByName(const std::string &name)
     {
         const static std::string commendStr
         ("select * from web where name=\'");
@@ -85,13 +85,13 @@ namespace MySql_
 
         MessType ans=sendCommend(commend);
 
-        webMes mes;
+        auto mes = std::make_shared<webMes>();
 
         if(ans.empty()) return mes;
 
         if(ans.size()>1) LOG_FATAL<<"More than one message !"<<Log::end;
 
-        mes.set(ans[0]);
+        mes->set(ans[0]);
 
         return mes;
     }

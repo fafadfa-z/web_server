@@ -35,7 +35,6 @@ namespace Log
         ::fclose(fp_);
     }
 
-    #include<string_view>
 
 
     void LogFile::writeMessage(const char *message, size_t len)
