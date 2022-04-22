@@ -32,7 +32,7 @@ namespace Base
 
         ~LocalMassage();
 
-        LocalMassage* entity(){return entity_;}
+        static LocalMassage* entity(){return entity_;}
 
         static int port() {return linstenPort_;}
 
@@ -40,6 +40,10 @@ namespace Base
 
         static std::string& logPath() {return logPath_;}
         static int triggerMod() {return triggerMod_;}
+
+
+        std::string configRead(const char*);
+        std::string configRead(const std::string& str);
 
     private:
 

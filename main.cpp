@@ -10,11 +10,11 @@
 
 std::shared_ptr<TCPServer> server;
 
-int main()
+int main1()
 {
     std::cout << "hellow! " << std::endl;
 
-    Base::LocalMassage::readConfig("/home/admin/program/web_server/config.conf");
+    Base::LocalMassage::readConfig("/root/code/web_server/web_server/config.conf");
 
     Log::init();
 

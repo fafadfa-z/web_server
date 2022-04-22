@@ -24,81 +24,99 @@ namespace Base
         std::string mes;
         while (readLine(mes))
         {
-            if(mes=="") break;
-            auto iter=std::find(mes.begin(),mes.end(),':');
+            if (mes == "")
+                break;
+            auto iter = std::find(mes.begin(), mes.end(), ':');
 
-            confMap_[std::string(mes.begin(),iter)]=std::string(iter+2,mes.end());
+            confMap_[std::string(mes.begin(), iter)] = std::string(iter + 2, mes.end());
         }
 
-        auto iter=confMap_.find("port");    
-        if(iter==confMap_.end())
+        auto iter = confMap_.find("port");
+        if (iter == confMap_.end())
         {
-            std::cout<<"fatal error: linstening port not be found"<<std::endl;
+            std::cout << "fatal error: linstening port not be found" << std::endl;
             std::terminate();
         }
 
-        int port=::atoi(iter->second.c_str());
-        
-        if(port<=0 || port>65535)
+        int port = ::atoi(iter->second.c_str());
+
+        if (port <= 0 || port > 65535)
         {
-            std::cout<<"fatal error: invalid port: "<<port<<std::endl;
+            std::cout << "fatal error: invalid port: " << port << std::endl;
             std::terminate();
         }
-        linstenPort_=port;
+        linstenPort_ = port;
 
-
-        iter=confMap_.find("log file direction");    
-        if(iter==confMap_.end())
+        iter = confMap_.find("log file direction");
+        if (iter == confMap_.end())
         {
-            std::cout<<"fatal error: cannot find the log file path"<<std::endl;
-            std::terminate();
-        }
-        else
-        {
-            int index = iter->second.find_first_not_of(" ");
-            logPath_=iter->second.substr(index,iter->second.size());
-        }
-
-        iter=confMap_.find("html file direction");    
-        if(iter==confMap_.end())
-        {
-            std::cout<<"fatal error: cannot find the html file path"<<std::endl;
+            std::cout << "fatal error: cannot find the log file path" << std::endl;
             std::terminate();
         }
         else
         {
             int index = iter->second.find_first_not_of(" ");
-            htmlPath_=iter->second.substr(index,iter->second.size());
+            logPath_ = iter->second.substr(index, iter->second.size());
         }
 
-        iter=confMap_.find("trigger_mod");  
-        if(iter!=confMap_.end())
+        iter = confMap_.find("html file direction");
+        if (iter == confMap_.end())
         {
-            const auto & flag=iter->second;
-             
-            auto temp=flag.find("ET");
-
-            if(temp<flag.size()) triggerMod_=MOD_ET;
-        } 
-
-
-        iter=confMap_.find("print message");    
-
-        if(iter!=confMap_.end())
+            std::cout << "fatal error: cannot find the html file path" << std::endl;
+            std::terminate();
+        }
+        else
         {
-            const auto & flag=iter->second;
-             
-            auto temp=flag.find("yes");
+            int index = iter->second.find_first_not_of(" ");
+            htmlPath_ = iter->second.substr(index, iter->second.size());
+        }
 
-            if(temp<flag.size()) prinfMes();
-        } 
+        iter = confMap_.find("trigger_mod");
+        if (iter != confMap_.end())
+        {
+            const auto &flag = iter->second;
+
+            auto temp = flag.find("ET");
+
+            if (temp < flag.size())
+                triggerMod_ = MOD_ET;
+        }
+
+        iter = confMap_.find("print message");
+
+        if (iter != confMap_.end())
+        {
+            const auto &flag = iter->second;
+
+            auto temp = flag.find("yes");
+
+            if (temp < flag.size())
+                prinfMes();
+        }
+    }
+
+    std::string LocalMassage::configRead(const char *str)
+    {
+        auto iter = confMap_.find(str);
+
+        if(iter == confMap_.end()) return std::string();
+
+        return iter->second;
+    }
+    std::string LocalMassage::configRead(const std::string &str)
+    {
+        auto iter = confMap_.find(str);
+
+        if(iter == confMap_.end()) return std::string();
+
+        return iter->second;
     }
 
     void LocalMassage::prinfMes()
     {
-        for(auto& [key,value] : confMap_)
+        for (auto &[key, value] : confMap_)
         {
-            std::cout<<key<<":\t"<<value<<std::endl;
+            std::cout << key << ":\t" << value << std::endl;
         }
     }
 

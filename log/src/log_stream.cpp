@@ -136,6 +136,8 @@ namespace Log
             auto [buf,index]=stream.buf_.updateMes();
 
             stream.updateCallBack_(buf,index);
+
+            stream.buf_.refresh();
         }
 
         return stream;

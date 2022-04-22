@@ -1,56 +1,103 @@
 #ifndef _TIMMRE_H
 #define _TIMMER_H
 
-#include<functional>
-#include<set>
-#include<vector>
-#include<mutex>
+#include <functional>
+#include <vector>
+#include <list>
+#include <atomic>
+#include <mutex>
 
 //定时器线程
 namespace Time
 {
- 
-   class Timmer
+    class TimerTask //定时器任务
     {
     public:
+        TimerTask(int time,bool repeatable = false,int id = 0);
 
-        using timeDuration=std::chrono::duration<int,std::milli>;
+        virtual ~TimerTask(){}
+
+        virtual void work() = 0;
+
+
+        long timePoint()const {return timePoint_;}
+
+    protected:
+
+        long timePoint_;  //记录应该执行的时间
+        long insertTime_; //记录放入定时器中的时间
+
+        bool repeatable_; //是否是重复事件
+
+        int id_; //便于以后用来删除
+    };
+
+    //需要传入时间的版本
+    class NeedTime : public TimerTask
+    {
+    public:
+        NeedTime(int time,int id = 0)
+            :TimerTask(time,id)
+        {}
+
+        void setTask(std::function<void(int)>task){task_ = task;}
+        
+        void work() override;
+
+
+        std::function<void(int)>task_;
+    };
+
+    //不需要时间的版本
+    class NotNeedTime : public TimerTask
+    {
+    public:
+        NotNeedTime(int time,int id = 0)
+            :TimerTask(time,id)
+        {}
+
+        void setTask(std::function<void()>task){task_ = task;}
+
+        void work() override
+        {
+            task_();
+        }
+
+        std::function<void()>task_;
+    };
+
+
+    // 定时器类，分辨率为10ms
+    class Timmer
+    {
+    public:
+        using timeDuration = std::chrono::duration<int, std::milli>;
 
         Timmer(int);
 
-        Timmer(const Timmer& another)=delete;
+        Timmer(const Timmer &another) = delete;
 
-        Timmer& operator=(const Timmer&another)=delete;
+        Timmer &operator=(const Timmer &another) = delete;
 
         ~Timmer();
 
         void start();
 
-        void addPeriodTask(std::function<void()>cb){PeriodTaskVec_.push_back(cb);};
+        void addOnceTask(std::function<void()>, int);
+        void addOnceTask(std::function<void(int)>, int);
 
-        void addOnceTask(std::function<void()>cb)
-        {
-            std::lock_guard<std::mutex>guard(mut_);
-            onceTaskVec_.push_back(cb);
-        };
 
-        int timeInterval(){return timeInterval_;}
-   
-        timeDuration useTime(){return useTime_;}
 
     private:
+        const int timeNum_;
 
-        const int timeInterval_;  //定时器步长(单位 毫秒)
+        std::vector<std::list<TimerTask*>> timeWheel_; //时间轮的数据结构
 
-        std::vector<std::function<void()>>PeriodTaskVec_; 
+        std::vector<std::mutex> mutexVec; //为时间轮每一个扇叶申请一个互斥锁
 
-        std::vector<std::function<void()>>onceTaskVec_;
+        int wheelIndex_; //时间轮指针
 
         bool working_;
-
-        std::mutex mut_;  //用来保护 onceTaskVec_
-
-       timeDuration useTime_; 
     };
 }
 
