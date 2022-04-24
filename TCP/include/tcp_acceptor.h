@@ -9,7 +9,9 @@
 class Acceptor
 {
 public:
-    Acceptor(std::function<void(int)>);
+    using FunctionType = std::function<void(int,std::chrono::time_point<std::chrono::system_clock>)>;
+
+    Acceptor(FunctionType);
 
     virtual  ~Acceptor();
 
@@ -33,7 +35,7 @@ protected:
 
     int listenFd_;
     
-    std::function<void(int)>submitCallBack_;
+    FunctionType submitCallBack_;
 
 private:
 

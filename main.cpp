@@ -5,28 +5,26 @@
 #include "tcp_server.h"
 #include "logger.h"
 #include "local_message.h"
-
+#include "timmer.h"
 
 
 std::shared_ptr<TCPServer> server;
 
-int main1()
+int main()
 {
     std::cout << "hellow! " << std::endl;
 
     Base::LocalMassage::readConfig("/root/code/web_server/web_server/config.conf");
 
-    Log::init();
+    Log::init();  // 初始化日志
 
-    auto httpSever=Http::HttpServer::init();
+    auto httpSever=Http::HttpServer::init(); // 初始化http服务器
 
     httpSever->beginServer();
     
+    auto tim = Time::Timmer::init(10);
 
-    while(1)
-    {   
-       std::this_thread::sleep_for(std::chrono::seconds(10));
-    }
-    
+    tim->start(); // 阻塞调用，开启定时器
+
     return 0;
 }

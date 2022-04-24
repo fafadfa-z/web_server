@@ -146,6 +146,8 @@ bool Channel::sendFile()
 void Channel::close()
 {
     poolPro_->removeFd(fd_);
+
+    server_->connDelFd(fd_);
 }
 
 Channel::~Channel()

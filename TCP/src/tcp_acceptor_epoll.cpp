@@ -41,6 +41,8 @@ void EpollConnect::acceptLoop()
 
                 auto connfd = accept(events_[i].data.fd, (sockaddr *)&clientAddress, &clientAddressLen);
 
+                auto beginTime = std::chrono::system_clock::now(); //记录当前时间
+
                 setSendBufSize(connfd, 2560); //设置发送缓存区大小
 
                 events_[i].data.fd = 0;
@@ -55,7 +57,7 @@ void EpollConnect::acceptLoop()
 
                 LOG_FATAL << "new player socket: " << connfd << " ip: " << ip << " port: " << port << " nums: " << nums_ << Log::end;
 
-                submitCallBack_(connfd); //回调服务器类
+                submitCallBack_(connfd,beginTime); //回调,提交描述符
             }
     }
     else if (messageSize == 0)

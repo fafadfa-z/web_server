@@ -6,6 +6,7 @@
 #include <list>
 #include <atomic>
 #include <mutex>
+#include <unordered_map>
 
 //定时器线程
 namespace Time
@@ -36,8 +37,8 @@ namespace Time
     class NeedTime : public TimerTask
     {
     public:
-        NeedTime(int time,int id = 0)
-            :TimerTask(time,id)
+        NeedTime(int time, bool repeatable = false,int id = 0)
+            :TimerTask(time,repeatable,id)
         {}
 
         void setTask(std::function<void(int)>task){task_ = task;}
@@ -52,8 +53,8 @@ namespace Time
     class NotNeedTime : public TimerTask
     {
     public:
-        NotNeedTime(int time,int id = 0)
-            :TimerTask(time,id)
+        NotNeedTime(int time,bool repeatable = false, int id = 0)
+            :TimerTask(time,repeatable,id)
         {}
 
         void setTask(std::function<void()>task){task_ = task;}
@@ -73,7 +74,7 @@ namespace Time
     public:
         using timeDuration = std::chrono::duration<int, std::milli>;
 
-        Timmer(int);
+        static Timmer* init(int);
 
         Timmer(const Timmer &another) = delete;
 
@@ -83,21 +84,34 @@ namespace Time
 
         void start();
 
-        void addOnceTask(std::function<void()>, int);
+        void addOnceTask(std::function<void()>, int);   // 用来添加单次任务
         void addOnceTask(std::function<void(int)>, int);
 
+        bool addPriodTask(std::function<void()>, int, int);  // 用来添加周期式任务
+        bool addPriodTask(std::function<void(int)>, int, int);
 
+        void removePriodTask(int); // 用来删除周期式任务
 
     private:
+
+        Timmer(int);
+
         const int timeNum_;
 
         std::vector<std::list<TimerTask*>> timeWheel_; //时间轮的数据结构
 
         std::vector<std::mutex> mutexVec; //为时间轮每一个扇叶申请一个互斥锁
 
+        
+        std::unordered_map<int,TimerTask*> priodTimerMap_; //存储周期型定时器
+        std::mutex priodTimerGuarder_;
+
         int wheelIndex_; //时间轮指针
 
         bool working_;
+
+
+        inline static Timmer* entity_ = nullptr;
     };
 }
 

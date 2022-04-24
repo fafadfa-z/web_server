@@ -16,7 +16,7 @@
 class EpollConnect:public Acceptor
 {
 public:
-    EpollConnect(std::function<void(int)>submitFun)
+    EpollConnect(FunctionType submitFun)
         :Acceptor(submitFun)
     {
     }

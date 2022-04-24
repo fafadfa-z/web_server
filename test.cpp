@@ -11,7 +11,7 @@ using namespace std::chrono;
 #include "local_message.h"
 #include "timmer.h"
 
-Time::Timmer tim(10);
+// Time::Timmer tim(10);
 
 void frint_time(long time)
 {
@@ -19,22 +19,17 @@ void frint_time(long time)
 
 }
 
-void timer_work()
-{
-	tim.start();
-}
-
-int main(int argc, char *argv[])
+int main111(int argc, char *argv[])
 {
 
-	Base::LocalMassage::readConfig("/root/code/web_server/web_server/config.conf");
-	Log::init();
+	// Base::LocalMassage::readConfig("/root/code/web_server/web_server/config.conf");
+	// Log::init();
 
-	std::thread th(timer_work);
+	// std::thread th(timer_work);
 
-	tim.addOnceTask(frint_time, 1000);
+	// tim.addOnceTask(frint_time, 1000);
 
-	th.join();
+	// th.join();
 
 	return 0;
 }

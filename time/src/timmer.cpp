@@ -10,15 +10,14 @@ namespace Time
 
     void delay_ms(int ms)
     {
-        auto begin =  duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        auto begin = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
         begin += ms;
 
-        while(begin>  duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count())
+        while (begin > duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count())
         {
             std::this_thread::yield();
         }
-
     }
 
     TimerTask::TimerTask(int time, bool repeatable, int id)
@@ -40,6 +39,14 @@ namespace Time
         task_(timeDur - insertTime_);
     }
 
+    Timmer *Timmer::init(int time)
+    {
+        if (entity_ == nullptr)
+            entity_ = new Timmer(time);
+
+        return entity_;
+    }
+
     Timmer::Timmer(int timeInterval)
         : timeNum_(1000 / timeInterval),
           timeWheel_(timeNum_),
@@ -51,6 +58,13 @@ namespace Time
 
     Timmer::~Timmer()
     {
+        for (auto &list : timeWheel_)
+        {
+            for (auto &timer : list)
+            {
+                delete timer;
+            }
+        }
     }
 
     void Timmer::addOnceTask(std::function<void()> task, int time) // time 单位：ms
@@ -76,11 +90,11 @@ namespace Time
     {
         int index = time;
 
-        index /= 1000 / timeNum_; //计算几个槽位之后进行
+        index /= 1000 / timeNum_;
 
-        index %= timeNum_; //去掉整圈的克度，需要向下移动多少个槽位
+        index %= timeNum_;
 
-        index = (index + wheelIndex_) / timeNum_; //计算需要放入的槽位
+        index = (index + wheelIndex_) / timeNum_;
 
         auto *timer = new NeedTime(time);
 
@@ -91,6 +105,73 @@ namespace Time
         timeWheel_[index].push_back(timer);
     }
 
+    bool Timmer::addPriodTask(std::function<void()> task, int time, int id)
+    {
+        NotNeedTime *timer;
+        {
+            std::lock_guard guard(priodTimerGuarder_);
+
+            auto iter = priodTimerMap_.find(id);
+
+            if (iter != priodTimerMap_.end())
+                return false;
+
+            timer = new NotNeedTime(time, true, id);
+
+            priodTimerMap_.insert(std::move(std::pair{id, timer}));
+        }
+
+        int index = time;
+
+        index /= 1000 / timeNum_;
+
+        index %= timeNum_;
+
+        index = (index + wheelIndex_) / timeNum_;
+
+        timer->setTask(task);
+
+        std::lock_guard guard(mutexVec[index]);
+
+        timeWheel_[index].push_back(timer);
+
+        return true;
+    }
+
+    bool Timmer::addPriodTask(std::function<void(int)> task, int time, int id)
+    {
+        NeedTime *timer;
+
+        {
+            std::lock_guard guard(priodTimerGuarder_);
+
+            auto iter = priodTimerMap_.find(id);
+
+            if (iter != priodTimerMap_.end())
+                return false;
+
+            timer = new NeedTime(time, true, id);
+
+            priodTimerMap_.insert(std::move(std::pair{id, timer}));
+        }
+
+        int index = time;
+
+        index /= 1000 / timeNum_;
+
+        index %= timeNum_;
+
+        index = (index + wheelIndex_) / timeNum_;
+
+        timer->setTask(task);
+
+        std::lock_guard guard(mutexVec[index]);
+
+        timeWheel_[index].push_back(timer);
+
+        return true;
+    }
+
     void Timmer::start()
     {
         if (working_)
@@ -98,23 +179,21 @@ namespace Time
 
         working_ = true;
 
-        long used=0; // 矫正时钟，记录每次使用了多长时间。
+        long used = 0; // 矫正时钟，记录每次使用了多长时间。
 
-        long timeBegin =  duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        long timeBegin = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
         while (working_)
         {
             delay_ms(1000 / timeNum_ - used);
-       
+
             long pre = timeBegin;
 
-            timeBegin =  duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+            timeBegin = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
-            used = timeBegin - pre - 10;
+            used = timeBegin - pre - 10; //计算上次运行了多长时间，用来校准定时器
 
-            if(used<0) used =0;
-
-
+            used = std::max(used, 0l);
 
             std::vector<TimerTask *> timeOutVec;
             timeOutVec.reserve(5);
@@ -131,7 +210,6 @@ namespace Time
                     timeOutVec.push_back(timer);
                     iter = wheelList.erase(iter); //小心这里迭代器失效的问题
                 }
-
             }
             mutexVec[wheelIndex_].unlock();
 
@@ -146,8 +224,8 @@ namespace Time
 
             wheelIndex_++;
 
-            if(wheelIndex_==timeNum_) wheelIndex_=0;
-
+            if (wheelIndex_ == timeNum_)
+                wheelIndex_ = 0;
         }
     }
 }

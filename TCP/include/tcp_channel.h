@@ -22,6 +22,10 @@
 #include "tcp_buffer.h"
 #include "time_point.h"
 
+
+#define TIME_RECOED 0
+
+
 class PoolProcess;
 class TCPServer;
 
@@ -38,7 +42,9 @@ public:
           fileSize_(0),
           fileIndex_(0),
           path_(std::nullopt),
+#if TIME_RECOED
           timeCost_("channel: "),
+#endif            
           buf_(buf)
     {
     }
@@ -80,8 +86,9 @@ private:
 
     std::optional<std::filesystem::path> path_;
     
+#if TIME_RECOED
     Time::TimeRecord timeCost_; // 记录占用时间
-
+#endif
     std::shared_ptr<Buffer> buf_;
 
 private:

@@ -9,7 +9,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-Acceptor::Acceptor(std::function<void(int)>submit)
+Acceptor::Acceptor(FunctionType submit)
     :submitCallBack_(submit)
 {
 

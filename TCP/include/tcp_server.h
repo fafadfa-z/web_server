@@ -7,7 +7,9 @@
 #include <map>
 #include <string>
 #include <algorithm>
+#include <chrono>
 #include <cassert>
+#include <atomic>
 
 #include <arpa/inet.h>
 #include <assert.h>
@@ -32,7 +34,9 @@ public:
     using NewconnFunction   = std::function<void(TCPConnection*)>;
     using ReadableFunction  = std::function<void(TCPConnection*)>;
 
-    static std::shared_ptr<TCPServer> init(int num);
+    using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
+
+    static std::shared_ptr<TCPServer> init(int num,bool disMes = false);
 
     ~TCPServer();
 
@@ -53,11 +57,18 @@ private:
    
     void connNew(Channel*);
 
+    void connNewFd(int,TimePoint); // 记录新的fd
+
+    void connDelFd(int);  //断开连接时记录信息
+
+    void disMes(long); //定时函数, 处理统计信息
+
+
+
+
     void connReadable(Channel*);
 
-    // void removeConnection(std::string index);
-
-    TCPServer(int threadNum);
+    TCPServer(int threadNum,bool disMes);
 
 private:
     std::shared_ptr<ThreadPool> pool_;      //线程池
@@ -69,8 +80,22 @@ private:
     std::function<void()> CloseCallBack_;
     
     const int threadNum_;   //当前线程池内线程个数
-    
+
+private: //记录统计信息
+
+    std::mutex mut_;
+    std::map<int,TimePoint>fdMap_; // 记录每个fd连接的时间
+
+    std::atomic<bool> recordFlag_;   //开始统计的标志位
+    long recordNum_;    //单次统计时间内的连接数
+    long maxNum_;       //单次统计内的最多连接数 
+    long currentNum_;   //当前的连接数
+
+    long totalTime_; // 记录总处理时间
+
     static std::shared_ptr<TCPServer> entity_;
+
+    const bool disMes_;
 };
 
 
